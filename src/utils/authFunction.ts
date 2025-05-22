@@ -7,8 +7,10 @@ import { judementSameArr } from '/@/utils/arrayOperation';
  * @returns 有权限，返回 `true`，反之则反
  */
 export function auth(value: string): boolean {
+	const allPermissions = "*/*/*"
 	const stores = useUserInfo();
-	return stores.userInfos.authBtnList.some((v: string) => v === value);
+	if (stores.permissions.includes(allPermissions)) return true
+	return stores.permissions.some((v: string) => v === value)
 }
 
 /**
@@ -18,12 +20,14 @@ export function auth(value: string): boolean {
  */
 export function auths(value: Array<string>): boolean {
 	let flag = false;
+	const allPermissions = "*/*/*"
 	const stores = useUserInfo();
-	stores.userInfos.authBtnList.map((val: string) => {
+	if (stores.permissions.includes(allPermissions)) return true
+	return stores.permissions.some((val: string) => {
 		value.map((v: string) => {
 			if (val === v) flag = true;
 		});
-	});
+	})
 	return flag;
 }
 
@@ -33,6 +37,8 @@ export function auths(value: Array<string>): boolean {
  * @returns 有权限，返回 `true`，反之则反
  */
 export function authAll(value: Array<string>): boolean {
+	const allPermissions = "*/*/*"
 	const stores = useUserInfo();
-	return judementSameArr(value, stores.userInfos.authBtnList);
+	if (stores.permissions.includes(allPermissions)) return true
+	return judementSameArr(value, stores.permissions);
 }
