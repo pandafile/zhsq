@@ -64,7 +64,7 @@
         <el-table-column label="字典标签" align="center" prop="dictLabel" />
         <el-table-column label="字典键值" align="center" prop="dictValue" />
         <el-table-column label="字典排序" align="center" prop="dictSort" />
-        <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
+        <el-table-column label="字典类型" align="center" prop="dictType" />
         <el-table-column label="创建时间" align="center" prop="createdAt" width="180"/>
         <el-table-column prop="status" label="字典状态" show-overflow-tooltip>
           <template #default="scope">
@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs, reactive, onMounted, ref, defineComponent } from 'vue';
+import { toRefs, reactive, onMounted, ref } from 'vue';
 import { ElMessageBox, ElMessage,FormInstance} from 'element-plus';
 import EditDic from '/@/views/system/dict/component/editDicData.vue';
 import {getDataList,deleteData} from "/@/api/system/dict/data";
@@ -121,12 +121,12 @@ interface TableDataState {
       dictType: string;
       dictLabel:string;
       status: string;
+			typeId:number;
     };
   };
 }
 defineOptions({ name: "apiV1SystemDictDataList"})
 const route = useRoute();
-const addDicRef = ref();
 const editDicRef = ref();
 const queryRef = ref();
 const state = reactive<TableDataState>({
@@ -140,14 +140,16 @@ const state = reactive<TableDataState>({
       pageSize: 10,
       dictLabel:'',
       dictType:'',
-      status:''
+      status:'',
+			typeId:0
     },
   },
 });
 const { tableData } = toRefs(state);
 // 初始化表格数据
-const initTableData = () => {
-  dataList()
+const initTableData = (typeId?: number) => {
+	state.tableData.param.typeId = typeId as number;
+	dataList()
 };
 const dataList=()=>{
   getDataList(state.tableData.param).then((res:any)=>{
@@ -206,4 +208,5 @@ const resetQuery = (formEl: FormInstance | undefined) => {
 const handleSelectionChange = (selection:TableDataRow[])=> {
   state.ids = selection.map(item => item.dictCode)
 };
+defineExpose({initTableData})
 </script>

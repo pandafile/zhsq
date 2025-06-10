@@ -172,12 +172,7 @@
         </el-table-column>
         <el-table-column label="字典类型" width="160">
           <template #default="scope">
-            <el-select v-model="scope.row.dictType" clearable filterable placeholder="请选择">
-              <el-option v-for="dict in dictOptions" :key="dict.dictType" :label="dict.dictName" :value="dict.dictType">
-                <span style="float: left">{{ dict.dictName }}</span>
-                <span style="float: right; color: #8492a6; font-size: 13px">{{ dict.dictType }}</span>
-              </el-option>
-            </el-select>
+						<el-cascader v-model="scope.row.dictType" :options="dictOptions" :props="typeProps" clearable :show-all-levels="false"/>
           </template>
         </el-table-column>
         <el-table-column label="关联表" width="160">
@@ -205,23 +200,31 @@
 </template>
 
 <script setup lang="ts">
-import { inject, onBeforeMount, ref} from 'vue';
+import { getCurrentInstance, inject, onBeforeMount, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
-import {DictOpt, TableColumns, TableDataInfo} from '/@/views/system/tools/gen/component/model';
+import {DictOpt, TableColumns} from '/@/views/system/tools/gen/component/model';
 import {optionselect} from "/@/api/system/dict/type";
 import RelationTable from "/@/views/system/tools/gen/component/relationTable.vue";
 import _ from "lodash";
 defineOptions({ name: "genTableColumns"})
+const {proxy} = getCurrentInstance() as any;
 const relationTableRef = ref();
 const tableColumnsRef = ref<FormInstance>();
 const info = inject<any>('tableData');
 // 表格的高度
 const tableHeight = ref(document.documentElement.scrollHeight - 300 + 'px');
 const dictOptions = ref(<DictOpt[]>[])
+const typeProps = ref({
+	value: 'dictType',
+	label: 'dictName',
+	children: 'children',
+	emitPath: false
+})
 onBeforeMount(()=>{
   //获取字典选项
   optionselect().then((res:any)=>{
-    dictOptions.value = res.data.dictType??[]
+    const data = res.data.dictType??[]
+		dictOptions.value = proxy.handleTree(data, 'dictId', 'pid', 'children', true)
   })
 })
 const handleChangeConfig = (row:TableColumns)=>{

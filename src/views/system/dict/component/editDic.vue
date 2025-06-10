@@ -2,6 +2,9 @@
 	<div class="system-edit-dic-container">
 		<el-dialog :title="(ruleForm.dictId!==0?'修改':'添加')+'字典'" v-model="isShowDialog" width="769px">
 			<el-form :model="ruleForm" ref="formRef" :rules="rules" size="default" label-width="90px">
+				<el-form-item label="上级" prop="pid">
+					<el-cascader v-model="ruleForm.pid" :options="dictTypeOpt" :props="typeProps" clearable />
+				</el-form-item>
         <el-form-item label="字典名称" prop="dictName">
           <el-input v-model="ruleForm.dictName" placeholder="请输入字典名称" />
         </el-form-item>
@@ -29,11 +32,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, toRefs, defineComponent,ref, unref } from 'vue';
-import { getType,addType,editType } from '/@/api/system/dict/type';
+import { reactive, toRefs, ref, unref, getCurrentInstance } from 'vue';
+import { getType, addType, editType, optionselect } from '/@/api/system/dict/type';
 import {ElMessage} from "element-plus";
 interface RuleFormState {
   dictId:number;
+	pid:number;
   dictName:string;
   dictType:string;
   status:number;
@@ -45,12 +49,22 @@ interface DicState {
   rules:{}
 }
 defineOptions({ name: "systemEditDic"})
+const {proxy} = getCurrentInstance() as any;
 const emit = defineEmits(['typeList']);
 const formRef = ref<HTMLElement | null>(null);
+const dictTypeOpt = ref<RuleFormState>()
+const typeProps = ref({
+	value: 'dictId',
+	label: 'dictName',
+	children: 'children',
+	checkStrictly:true,
+	emitPath: false
+})
 const state = reactive<DicState>({
   isShowDialog: false,
   ruleForm: {
     dictId:0,
+		pid:0,
     dictName:'',
     dictType:'',
     status:1,
@@ -66,9 +80,16 @@ const state = reactive<DicState>({
   }
 });
 const { isShowDialog,ruleForm,rules } = toRefs(state);
+const getParent = () => {
+	optionselect(true).then((res:any)=>{
+		const data = res.data.dictType??[]
+		dictTypeOpt.value = proxy.handleTree(data, 'dictId', 'pid', 'children', true)
+  })
+}
 // 打开弹窗
 const openDialog = (row: RuleFormState|null) => {
   resetForm();
+	getParent();
   if (row){
     getType(row.dictId).then((res:any)=>{
       state.ruleForm = res.data.dictType
@@ -81,6 +102,7 @@ defineExpose({ openDialog})
 const resetForm = ()=>{
   state.ruleForm = {
     dictId:0,
+		pid:0,
     dictName:'',
     dictType:'',
     status:1,

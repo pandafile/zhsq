@@ -102,7 +102,7 @@
 <script setup lang="ts">
 import {toRefs, reactive, onMounted, ref, watch, getCurrentInstance} from 'vue';
 import {ElTree,FormInstance} from 'element-plus';
-import { Search } from '@element-plus/icons-vue'
+	import { Search } from '@element-plus/icons-vue'
 import UserList from '/@/views/system/user/component/userList.vue';
 import {getDeptTree} from '/@/api/system/user';
 

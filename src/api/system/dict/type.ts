@@ -43,10 +43,11 @@ export function deleteType(dictIds:number[]) {
 
 
 // 获取字典选择框列表
-export function optionselect() {
+export function optionselect(all?:boolean) {
     return request({
         url: '/api/v1/system/dict/type/optionSelect',
-        method: 'get'
+        method: 'get',
+				params:{all}
     })
 }
 
