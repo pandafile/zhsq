@@ -43,6 +43,7 @@
 								show-checkbox
 								@check-change="handleCheckChange"
 								node-key="dictId"
+                :check-on-click-leaf="false"
 							/>
 						</el-scrollbar>
 					</el-aside>
