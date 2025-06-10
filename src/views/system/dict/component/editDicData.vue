@@ -2,8 +2,8 @@
 	<div class="system-edit-dic-container">
 		<el-dialog :title="(ruleForm.dictCode!==0?'修改':'添加')+'字典'" v-model="isShowDialog" width="769px">
 			<el-form :model="ruleForm" ref="formRef" :rules="rules" size="default" label-width="90px">
-        <el-form-item label="字典类型">
-          <el-input v-model="ruleForm.dictType" :disabled="true" />
+        <el-form-item label="字典类型" prop="dictType">
+					<el-cascader v-model="ruleForm.dictType" :options="dictTypeOpt" :props="typeProps" clearable :show-all-levels="false"/>
         </el-form-item>
         <el-form-item label="数据标签" prop="dictLabel">
           <el-input v-model="ruleForm.dictLabel" placeholder="请输入数据标签" />
@@ -45,9 +45,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, toRefs, defineComponent,ref, unref } from 'vue';
+import { reactive, toRefs, ref, unref, getCurrentInstance } from 'vue';
 import { getData,addData,editData } from '/@/api/system/dict/data';
 import {ElMessage} from "element-plus";
+import { optionselect } from '/@/api/system/dict/type';
 interface RuleFormState {
   dictCode: number;
   dictLabel: string;
@@ -64,6 +65,7 @@ interface DicState {
   rules:{}
 }
 defineOptions({ name: "systemEditDicData"})
+const {proxy} = getCurrentInstance() as any;
 const prop = defineProps({
   dictType:{
     type:String,
@@ -72,6 +74,14 @@ const prop = defineProps({
 })
 const emit = defineEmits(['dataList']);
 const formRef = ref<HTMLElement | null>(null);
+const dictTypeOpt = ref<RuleFormState>()
+const typeProps = ref({
+	value: 'dictType',
+	label: 'dictName',
+	children: 'children',
+	emitPath: false,
+	checkStrictly:true
+})
 const state = reactive<DicState>({
   isShowDialog: false,
   ruleForm: {
@@ -85,6 +95,9 @@ const state = reactive<DicState>({
     dictType:prop.dictType
   },
   rules: {
+		dictType:[
+			{ required: true, message: "请选择字典类型", trigger: "change" }
+		],
     dictLabel: [
       { required: true, message: "数据标签不能为空", trigger: "blur" }
     ],
@@ -97,9 +110,16 @@ const state = reactive<DicState>({
   }
 });
 const { isShowDialog,ruleForm,rules } = toRefs(state);
+const getTypeOpt = () => {
+	optionselect(true).then((res:any)=>{
+		const data = res.data.dictType??[]
+		dictTypeOpt.value = proxy.handleTree(data, 'dictId', 'pid', 'children', true)
+	})
+}
 // 打开弹窗
 const openDialog = (row: RuleFormState|null) => {
-  resetForm();
+	getTypeOpt()
+  resetForm()
   if (row){
     getData(row.dictCode).then((res:any)=>{
       state.ruleForm = res.data.dict

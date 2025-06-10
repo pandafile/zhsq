@@ -151,7 +151,7 @@ const filterNode = (value: string, data:any) => {
 // 节点单击事件
 const handleNodeClick = (data:TableDataRow) => {
 	selectedNode.value = data
-	dataViewRef.value.initTableData(data.dictId)
+	dataViewRef.value.initTableData(data.dictId,data.dictType)
 };
 
 const handleCheckChange = (

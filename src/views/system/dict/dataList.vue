@@ -87,7 +87,7 @@
           @pagination="dataList"
       />
     </el-card>
-    <EditDic ref="editDicRef" @dataList="dataList" :dict-type="tableData.param.dictType"/>
+    <EditDic ref="editDicRef" @dataList="dataList" :dict-type="selectedTypeCode"/>
   </div>
 </template>
 
@@ -129,6 +129,7 @@ defineOptions({ name: "apiV1SystemDictDataList"})
 const route = useRoute();
 const editDicRef = ref();
 const queryRef = ref();
+const selectedTypeCode = ref("");
 const state = reactive<TableDataState>({
   ids:[],
   tableData: {
@@ -147,8 +148,9 @@ const state = reactive<TableDataState>({
 });
 const { tableData } = toRefs(state);
 // 初始化表格数据
-const initTableData = (typeId?: number) => {
+const initTableData = (typeId?: number,code?:string) => {
 	state.tableData.param.typeId = typeId as number;
+	selectedTypeCode.value = code as string;
 	dataList()
 };
 const dataList=()=>{
