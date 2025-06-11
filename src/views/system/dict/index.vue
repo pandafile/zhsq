@@ -32,7 +32,7 @@
 								</el-button>
 							</div>
 							<el-divider />
-							<el-input :prefix-icon="search" v-model="filterText" placeholder="请输入部门名称" clearable style="margin-bottom: 8px;"/>
+							<el-input :prefix-icon="search" v-model="filterText" placeholder="请输入字典名称" clearable style="margin-bottom: 8px;"/>
 							<el-tree
 								ref="treeRef"
 								class="filter-tree"

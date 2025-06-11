@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import {toRefs, reactive, onMounted, ref, defineComponent} from 'vue';
-import {ElMessageBox, ElMessage, FormInstance} from 'element-plus';
+import {ElMessageBox, ElMessage, FormInstance,ElLoading } from 'element-plus';
 import {getTableList, deleteTables, batchGenCode, syncTable} from "/@/api/system/tools/gen";
 import {TableData,TableDataState} from "/@/views/system/tools/gen/component/model"
 import importTable from "/@/views/system/tools/gen/component/importTable.vue";
@@ -220,11 +220,14 @@ const handleGenTable=(row: TableData|null)=>{
     type: 'warning',
   })
       .then(() => {
+				const loading = ElLoading.service({text:'生成中...'})
         batchGenCode(ids).then(()=>{
           ElMessage.success('生成成功');
           resetMenuSession()
           tableList();
-        })
+        }).finally(() => {
+					loading.close()
+				})
       })
       .catch(() => {});
 }
