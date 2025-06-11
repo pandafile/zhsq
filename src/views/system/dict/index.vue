@@ -184,4 +184,8 @@ watch(filterText, (val) => {
 </script>
 <style scoped lang="scss">
 .btm8{margin-bottom: 8px;}
+.filter-tree{
+	height: calc(100vh - 290px);
+	overflow-y: auto;
+}
 </style>
