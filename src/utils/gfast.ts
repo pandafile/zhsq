@@ -30,54 +30,57 @@ export function getUpFileUrl(url:string){
  * @param {*} rootId 根Id 默认 0
  */
 export function handleTree(data:any[], id:string, parentId:string, children:string, rootId:any):any[] {
-    id = id || 'id'
-    parentId = parentId || 'parentId'
-    children = children || 'children'
-    let rootIds:any = []
-    if(typeof rootId === 'boolean' && rootId){
-        //自动获取rootId
-        let idSet:any = {}
-        data.map((item:any)=>{
-            idSet[item[id]] = true
-        })
-        data.map((item:any)=>{
-            if(!idSet[item[parentId]]){
-                rootIds.push(item[parentId])
-            }
-        })
-    }else{
-        rootId = rootId || 0
-        rootIds = [rootId]
-    }
-    rootIds = [...new Set(rootIds)]
-    let treeData:any = []
-    //对源数据深度克隆
-    const cloneData = JSON.parse(JSON.stringify(data))
-    rootIds.map((rItem:any)=>{
-        //循环所有项
-        const td =  cloneData.filter((father:any) => {
-            let branchArr = cloneData.filter((child:any) => {
-                //返回每一项的子级数组
-                return father[id] === child[parentId]
-            });
-            branchArr.length > 0 ? father[children] = branchArr : '';
-            //返回第一层
-            switch (typeof father[parentId]){
-                case 'string':
-                    if(father[parentId]===''&&rItem===0){
-                        return true
-                    }
-                    return father[parentId]===rItem.toString();
-                case 'number':
-                    return father[parentId] === rItem;
-            }
-            return false;
-        });
-        if(td.length>0){
-            treeData = [...treeData,...td]
-        }
-    })
-    return treeData != '' ? treeData : data;
+	id = id || 'id'
+	parentId = parentId || 'parentId'
+	children = children || 'children'
+	let rootIds:any = []
+	if(typeof rootId === 'boolean' && rootId){
+		//自动获取rootId
+		let idSet:any = {}
+		data.map((item:any)=>{
+			idSet[item[id]] = true
+		})
+		data.map((item:any)=>{
+			if(!idSet[item[parentId]]){
+				rootIds.push(item[parentId])
+			}
+		})
+	}else if(typeof rootId ==='string'){
+		rootId = rootId || ''
+		rootIds = [rootId]
+	}else{
+		rootId = rootId || 0
+		rootIds = [rootId]
+	}
+	rootIds = [...new Set(rootIds)]
+	let treeData:any = []
+	//对源数据深度克隆
+	const cloneData = JSON.parse(JSON.stringify(data))
+	rootIds.map((rItem:any)=>{
+		//循环所有项
+		const td =  cloneData.filter((father:any) => {
+			let branchArr = cloneData.filter((child:any) => {
+				//返回每一项的子级数组
+				return father[id] === child[parentId]
+			});
+			branchArr.length > 0 ? father[children] = branchArr : '';
+			//返回第一层
+			switch (typeof father[parentId]){
+				case 'string':
+					if(father[parentId]===''&&rItem===0){
+						return true
+					}
+					return father[parentId]===rItem.toString();
+				case 'number':
+					return father[parentId] === rItem;
+			}
+			return false;
+		});
+		if(td.length>0){
+			treeData = [...treeData,...td]
+		}
+	})
+	return treeData != '' ? treeData : data;
 }
 
 export function flattenTree(treeArray:any[]):any[] {
