@@ -88,12 +88,12 @@ export function getJobLogs(req:object){
 }
 
 // 删除定时任务日志
-export function delSysJobLog(logIds:number[]) {
+export function delSysJobLog(targetName:string) {
   return request({
     url: '/api/v1/system/sysJob/deleteLogs',
     method: 'delete',
     data:{
-      logIds:logIds
+      targetName
     }
   })
 }

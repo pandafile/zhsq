@@ -32,10 +32,10 @@
             <el-form-item label="状态">{{ proxy.getOptionValue(formData.status, statusOptions,'value','label') }}</el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="创建者">{{ formData.createdUser.userNickname }}</el-form-item>
+            <el-form-item label="创建者">{{ formData.createdUser?.userNickname }}</el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="更新者">{{ formData.updatedUser.userNickname }}</el-form-item>
+            <el-form-item label="更新者">{{ formData.updatedUser?.userNickname }}</el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="备注信息">{{ formData.remark }}</el-form-item>
@@ -51,9 +51,8 @@
           class="btn-del"
           type="danger"
           size="small"
-          :disabled="multiple"
-          @click="handleDelete(null)"
-      ><el-icon><ele-Delete /></el-icon>删除</el-button>
+          @click="handleDelete"
+      ><el-icon><ele-Delete /></el-icon>清空日志</el-button>
       <el-divider />
       <el-table v-loading="logList.loading" :data="logList.data" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
@@ -203,31 +202,16 @@ const handleSelectionChange = (selection:Array<SysJobLogData>) => {
   logList.logIds = selection.map(item => item.id)
   multiple.value = !selection.length
 };
-const handleDelete = (row: SysJobLogData) => {
-  let msg = '你确定要删除所选数据？';
-  let logId:number[] = [] ;
-  let targetName:string='';
-  if(row){
-    msg = `此操作将永久删除数据，是否继续?`
-    logId = [row.id]
-    targetName = row.targetName
-  }else{
-    logId = logList.logIds
-    targetName=state.formData.invokeTarget!
-  }
-  if(logId.length===0){
-    ElMessage.error('请选择要删除的数据。');
-    return
-  }
-  ElMessageBox.confirm(msg, '提示', {
+const handleDelete = () => {
+  ElMessageBox.confirm('你确定要清空日志？', '提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
   })
       .then(() => {
-        delSysJobLog(logId).then(()=>{
+        delSysJobLog(logList.param.targetName!).then(()=>{
           ElMessage.success('删除成功');
-          getLogList(targetName);
+          getLogList(logList.param.targetName!);
         })
       })
       .catch(() => {});
