@@ -2,6 +2,7 @@
 
 export interface TableData {
     tableId:number;
+    group:string;
     tableName:string;
     tableComment:string;
     className:string;
@@ -109,12 +110,14 @@ export interface ImportTableDataState{
         total:number;
         loading:boolean;
         param:{
+            group: string
             pageNum: number;
             pageSize: number;
             tableName: string;
             tableComment: string;
         }
     }
+    groups: Array<string>
 }
 
 export interface previewState{
