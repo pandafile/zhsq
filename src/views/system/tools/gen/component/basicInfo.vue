@@ -4,6 +4,11 @@
 			<el-form ref="basicInfoFormRef" :model="info" :rules="rules" label-width="150px" size="default" class="mt35 mb35">
 				<el-row :gutter="35">
 					<el-col class="mb20" :span="12">
+						<el-form-item label="数据库" prop="group">
+							<el-input placeholder="请输入数据库Group" v-model="info.group" />
+						</el-form-item>
+					</el-col>
+					<el-col class="mb20" :span="12">
 						<el-form-item label="表名称" prop="tableName">
 							<el-input placeholder="请输入仓库名称" v-model="info.tableName" />
 						</el-form-item>

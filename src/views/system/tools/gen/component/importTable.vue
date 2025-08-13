@@ -2,6 +2,11 @@
   <!-- 导入表 -->
   <el-dialog title="导入表" v-model="visible" width="800px" top="5vh" append-to-body :close-on-click-modal="false">
     <el-form :model="tableData.param" ref="queryFormRef" :inline="true">
+      <el-form-item label="数据库group" prop="group" style="width: 100%">
+        <el-select v-model="tableData.param.group" placeholder="请选择数据库" @change="updateGroup">
+          <el-option v-for="item in state.groups" :key="item" :label="item" :value="item" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="表名称" prop="tableName">
         <el-input
             v-model="tableData.param.tableName"
@@ -51,7 +56,7 @@
 <script setup lang="ts">
 import {defineComponent, reactive, ref, toRefs} from "vue";
 import {ImportTableDataState,TableData} from "/@/views/system/tools/gen/component/model"
-import {getImportTableList, importTable} from "/@/api/system/tools/gen";
+import {getDBList, getImportTableList, importTable} from "/@/api/system/tools/gen";
 import {ElMessage} from "element-plus/es";
 defineOptions({ name: "importTable"})
 const emit = defineEmits(['ok'])
@@ -66,15 +71,26 @@ const state = reactive<ImportTableDataState>({
     total:0,
     loading:true,
     param:{
+      group: '',
       pageNum: 1,
       pageSize: 10,
       tableName: '',
       tableComment: ''
     },
-  }
+  },
+  groups:[]
 })
 const {tableData} = toRefs(state)
 const getList = ()=>{
+  getDBList().then(res=>{
+    state.groups = res.data.list??[]
+    getImportTableList(state.tableData.param).then(res=>{
+      state.tableData.data = res.data.list??[]
+      state.tableData.total = res.data.total
+    })
+  })
+}
+const updateGroup = ()=> {
   getImportTableList(state.tableData.param).then(res=>{
     state.tableData.data = res.data.list??[]
     state.tableData.total = res.data.total
@@ -86,6 +102,7 @@ const handleQuery = ()=>{
 }
 const resetQuery=()=>{
   queryFormRef.value.resetFields()
+	state.tableData.param.group = state.groups[0]
   getList()
 }
 const clickRow=(row:TableData)=>{
@@ -99,7 +116,7 @@ const handleImportTable=()=>{
     ElMessage.error("请选择要导入的表格");
     return
   }
-  importTable(tables).then((res:any)=>{
+  importTable(tables, state.tableData.param.group).then((res:any)=>{
     if (res.code === 0) {
       ElMessage.success('导入成功');
       visible.value = false;

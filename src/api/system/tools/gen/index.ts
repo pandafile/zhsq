@@ -1,5 +1,12 @@
 import request from '/@/utils/request';
 
+export function getDBList() {
+    return request({
+        url: '/api/v1/system/tools/gen/dbList',
+        method: 'get',
+    })
+}
+
 export function getTableList(query:Object) {
     return request({
         url: '/api/v1/system/tools/gen/tableList',
@@ -17,11 +24,11 @@ export function getImportTableList(query:Object) {
 }
 
 
-export function importTable(tables:string[]) {
+export function importTable(tables:string[], group:string) {
     return request({
         url: '/api/v1/system/tools/gen/importTableSave',
         method: 'post',
-        data:{tables:tables}
+        data:{tables:tables, group:group}
     })
 }
 
