@@ -84,7 +84,6 @@ const {tableData} = toRefs(state)
 const getList = ()=>{
   getDBList().then(res=>{
     state.groups = res.data.list??[]
-    state.tableData.param.group = state.groups[0]
     getImportTableList(state.tableData.param).then(res=>{
       state.tableData.data = res.data.list??[]
       state.tableData.total = res.data.total
@@ -103,6 +102,7 @@ const handleQuery = ()=>{
 }
 const resetQuery=()=>{
   queryFormRef.value.resetFields()
+	state.tableData.param.group = state.groups[0]
   getList()
 }
 const clickRow=(row:TableData)=>{
