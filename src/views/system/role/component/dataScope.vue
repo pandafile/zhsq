@@ -8,7 +8,7 @@
           <el-input v-model="form.roleName" :disabled="true" />
         </el-form-item>
       </el-form>
-      <el-table ref="tableRef" :data="menuTableData" style="width: 100%" row-key="path" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }" @selection-change="handleSelectionChange">
+      <el-table ref="tableRef" :data="menuTableData" style="width: 100%" row-key="id" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column label="菜单名称" >
           <template #default="scope">
@@ -166,8 +166,9 @@ const handleCheckedTreeConnect = (value:any) => {
   deptCheckStrictly.value = value ? true : false;
 }
 /** 提交按钮（数据权限） */
-const submitDataScope = () => {
+const submitDataScope = async () => {
   form.authData = []
+	await nextTick()
   //获取选中的菜单
   let rows = tableRef.value.getSelectionRows()
   rows.map((item:any)=>{

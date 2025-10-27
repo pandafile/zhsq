@@ -76,13 +76,13 @@
                   </el-icon>
                   重置
                 </el-button>
-                <el-button size="default" type="success" class="ml10" @click="onOpenAddUser">
+                <el-button size="default" type="success" class="ml10" v-auth="'api/v1/system/user/add'" @click="onOpenAddUser">
                   <el-icon>
                     <ele-FolderAdd />
                   </el-icon>
                   新增用户
                 </el-button>
-                <el-button size="default" type="danger" class="ml10" @click="onRowDel()">
+                <el-button size="default" type="danger" class="ml10" v-auth="'api/v1/system/user/delete'" @click="onRowDel()">
                   <el-icon>
                     <ele-Delete />
                   </el-icon>

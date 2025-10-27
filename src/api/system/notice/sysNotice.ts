@@ -71,10 +71,10 @@ export function unReadCount(){
 }
 
 //获取私信待选择的用户
-export function getUserList(query:string){
-  return request({
-    url:'/api/v1/system/sysNotice/userList',
-    method:'get',
-    params:{userNickname:query}
-  })
+export function getUserList(query:object){
+	return request({
+		url:'/api/v1/system/sysNotice/userList',
+		method:'get',
+		params:query
+	})
 }

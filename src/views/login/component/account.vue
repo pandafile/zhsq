@@ -82,13 +82,12 @@
 
 <script setup lang="ts">
 import {
-  toRefs,
-  reactive,
-  defineComponent,
-  computed,
-  onMounted,
-  getCurrentInstance,
-  ref, unref
+	toRefs,
+	reactive,
+	computed,
+	onMounted,
+	getCurrentInstance,
+	ref, unref, inject,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
@@ -103,6 +102,7 @@ import { formatAxis } from '/@/utils/formatTime';
 import { NextLoading } from '/@/utils/loading';
 import {captcha, login} from "/@/api/login";
 import GoCaptchaBtn from "/@/components/goCaptcha/GoCaptchaBtn.vue";
+import Websocket from '/@/utils/websocket';
 defineOptions({ name: "loginAccount"})
 const { t } = useI18n();
 const {proxy} = <any>getCurrentInstance();
@@ -113,6 +113,7 @@ const router = useRouter();
 const loginForm = ref(null)
 const checkCaptchaResult = ref('default')
 const verifyStatus = ref(0)
+const onMessageList = inject<Array<Function>>('onMessageList');
 const state = reactive({
   isShowPassword: false,
   ruleForm: {
@@ -173,6 +174,12 @@ const onSignIn = async () => {
         Session.set('permissions',res.data.permissions)
         // 模拟数据，对接接口时，记得删除多余代码及对应依赖的引入。用于 `/src/stores/userInfo.ts` 中不同用户登录判断（模拟数据）
         Cookies.set('username', state.ruleForm.username);
+				const onMessage = (event: any) => {
+					onMessageList!.forEach((f) => {
+						f.call(null, event);
+					});
+				};
+				Websocket(onMessage);
         if (!themeConfig.value.isRequestRoutes) {
           // 前端控制路由，2、请注意执行顺序
           await initFrontEndControlRoutes();

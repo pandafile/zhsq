@@ -55,6 +55,11 @@ export interface SysNoticeEditState{
     loading:boolean;
     isShowDialog: boolean;
     userListOptions:object[];
+		userSearchQuery:string;
+		userPageNum:number;
+		userPageSize:number;
+		hasMoreUsers:boolean;
+		selectVisible:boolean;
     title:string;
     formData:SysNoticeInfoData;
     rules: object;

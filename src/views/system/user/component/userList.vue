@@ -28,9 +28,9 @@
       <el-table-column prop="createdAt" label="创建时间" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-button size="small" text type="primary" @click="onOpenEditUser(scope.row)">修改</el-button>
-          <el-button size="small" text type="primary" @click="onRowDel(scope.row)">删除</el-button>
-          <el-button size="small" text type="primary" @click="handleResetPwd(scope.row)">重置</el-button>
+					<el-button v-auth="'api/v1/system/user/edit'" size="small" text type="primary" @click="onOpenEditUser(scope.row)">修改</el-button>
+					<el-button v-auth="'api/v1/system/user/delete'" size="small" text type="primary" @click="onRowDel(scope.row)">删除</el-button>
+          <el-button v-auth="'api/v1/system/user/resetPwd'" size="small" text type="primary" @click="handleResetPwd(scope.row)">重置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -80,10 +80,6 @@ const props = defineProps({
   param:{
     type:Object,
     default:()=>{}
-  },
-  genderData:{
-    type:Array,
-    default:()=>[]
   }
  })
 const {proxy} = <any>getCurrentInstance();

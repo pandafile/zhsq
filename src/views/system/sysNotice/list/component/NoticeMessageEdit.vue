@@ -13,12 +13,6 @@
         <el-form-item label="标题" prop="title">
           <el-input v-model="formData.title" placeholder="请输入标题"/>
         </el-form-item>
-        <!--        <el-form-item label="类型" prop="type">
-                  <el-select v-model="formData.type" placeholder="请选择类型">
-                    <el-option label="请选择字典生成" value=""/>
-                  </el-select>
-                </el-form-item>-->
-
         <el-form-item v-if="formData.type==2" label="接收用户">
           <el-select
               style="width: 100%;"
@@ -30,6 +24,7 @@
               placeholder="可输入要指定的用户名称搜索"
               :remote-method="remoteUserMethod"
               :loading="loading"
+              @visible-change="handleSelectVisible"
           >
             <el-option
                 v-for="item in userListOptions"
@@ -37,6 +32,12 @@
                 :label="item.userNickname"
                 :value="item.id"
             />
+            <template #footer>
+              <div class="select-dropdown-footer">
+                <el-button v-if="hasMoreUsers" type="primary" link @click="loadMoreUsers" :loading="loading">{{ loading ? '加载中...' : '加载更多' }}</el-button>
+                <span v-else class="no-more-text">没有更多数据</span>
+              </div>
+            </template>
           </el-select>
         </el-form-item>
         <el-form-item label="标签" prop="tag">
@@ -110,6 +111,11 @@ const state = reactive<SysNoticeEditState>({
   isShowDialog: false,
   title: "",
   userListOptions: [],
+  userSearchQuery: "",
+  userPageNum: 1,
+  userPageSize: 10,
+  hasMoreUsers: false,
+  selectVisible: false,
   formData: {
     id: undefined,
     receiver: undefined,
@@ -146,9 +152,9 @@ const state = reactive<SysNoticeEditState>({
     ],
   }
 });
-const { isShowDialog,formData,loading,userListOptions,rules,title} = toRefs(state)
+const { isShowDialog,formData,loading,userListOptions,rules,title,userSearchQuery,userPageNum,userPageSize,hasMoreUsers,selectVisible} = toRefs(state)
 onMounted(() => {
-  remoteUserMethod("");
+  // 初始化时不加载用户列表，等到下拉框打开时再加载
 });
 // 打开弹窗
 const openDialog = (row?: SysNoticeInfoData) => {
@@ -171,27 +177,74 @@ const openDialog = (row?: SysNoticeInfoData) => {
   }
   state.isShowDialog = true;
 };
+// 处理下拉框显示状态变化
+const handleSelectVisible = (visible: boolean) => {
+  state.selectVisible = visible;
+  if (visible && state.userListOptions.length === 0) {
+    // 下拉框打开且没有数据时，加载第一页数据
+    state.userPageNum = 1;
+    loadUserList();
+  }
+};
+
+// 已移除滚动事件处理函数
+
+// 加载更多用户
+const loadMoreUsers = () => {
+  if (state.loading || !state.hasMoreUsers) return;
+  state.userPageNum++;
+  console.log('点击加载更多，当前页码：', state.userPageNum);
+  loadUserList(false);
+};
+
+// 加载用户列表
+const loadUserList = (replace: boolean = true) => {
+  state.loading = true;
+  const params = {
+    userNickname: state.userSearchQuery,
+    pageNum: state.userPageNum,
+    pageSize: state.userPageSize
+  };
+
+  getUserList(params).then((res: any) => {
+    if (res.code === 0 && res.data) {
+      const userList = res.data.userList || [];
+      const total = res.data.total || 0;
+
+      // 判断是否有更多数据
+      state.hasMoreUsers = state.userPageNum * state.userPageSize < total;
+
+      // 替换或追加数据
+      if (replace) {
+        state.userListOptions = userList;
+      } else {
+        // 合并数据并去重
+        const newList = [...state.userListOptions, ...userList];
+        const uniqueIds = new Set();
+        state.userListOptions = newList.filter(item => {
+          if (uniqueIds.has(item.id)) return false;
+          uniqueIds.add(item.id);
+          return true;
+        });
+      }
+    } else {
+      ElMessage.error(res.message || '获取用户列表失败');
+    }
+  }).catch(error => {
+    console.error('获取用户列表出错:', error);
+    ElMessage.error('获取用户列表失败');
+  }).finally(() => {
+    state.loading = false;
+  });
+};
+
+// 远程搜索方法
 const remoteUserMethod = (query: string) => {
-  //console.log("remoteMethod", query)
-  state.userListOptions = []
-  getUserList(query).then((res: any) => {
-    /*console.log(res)*/
-    // let list:object[]
-    //list=res.data
-    state.userListOptions = res.data.userList
-  })
-  /*      if (query) {
-    loading.value = true
-    setTimeout(() => {
-      loading.value = false
-      options.value = list.value.filter((item) => {
-        return item.label.toLowerCase().includes(query.toLowerCase())
-      })
-    }, 200)
-  } else {
-    options.value = []
-  }*/
-}
+  state.userSearchQuery = query;
+  state.userPageNum = 1; // 重置页码
+  state.userListOptions = []; // 清空现有数据
+  loadUserList();
+};
 //设置类型
 const setType = (type: number) => {
   state.formData.type = type
@@ -275,5 +328,19 @@ defineExpose({openDialog,setType})
 
 .kv-row {
   margin-bottom: 12px;
+}
+
+.select-dropdown-footer {
+  padding: 8px;
+  text-align: center;
+  border-top: 1px solid #ebeef5;
+  height: 36px;
+  line-height: 20px;
+  box-sizing: border-box;
+}
+
+.select-dropdown-footer .no-more-text {
+  color: #909399;
+  font-size: 13px;
 }
 </style>

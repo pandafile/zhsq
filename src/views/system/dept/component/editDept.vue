@@ -146,14 +146,14 @@ const onSubmit = () => {
       if(state.ruleForm.deptId===0){
         //添加
         addDept(state.ruleForm).then(()=>{
-          ElMessage.success('角色添加成功');
+          ElMessage.success('部门添加成功');
           closeDialog(); // 关闭弹窗
           emit('deptList')
         });
       }else{
         //修改
         editDept(state.ruleForm).then(()=>{
-          ElMessage.success('角色修改成功');
+          ElMessage.success('部门修改成功');
           closeDialog(); // 关闭弹窗
           emit('deptList')
         });

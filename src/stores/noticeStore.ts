@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import {NoticeMessage, NoticeStates} from "/@/stores/interface";
 
-export const noticeStore = defineStore({
-    id: 'noticeStore',
+export const noticeStore = defineStore('noticeStore',{
     state: (): NoticeStates => <NoticeStates>({
         message: {}
     }),

@@ -66,7 +66,7 @@
             <el-button
                 type="primary"
                 @click="handleAdd(1)"
-                v-auth="'api/v1/system/sysNotice/noticeAdd'"
+                v-auth="'api/v1/system/sysNotice/add'"
             >
               <el-icon>
                 <ele-Plus/>
