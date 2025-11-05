@@ -81,6 +81,8 @@ export interface TableDataInfo extends TableData{
     columns:TableColumns[];
     overwriteInfo:Array<any>;
     menuPid:number;
+		attachment:boolean,
+		attachments:any[];
 }
 export interface TableDataState {
     ids:number[];

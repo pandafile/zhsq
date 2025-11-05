@@ -24,9 +24,10 @@
 				</el-row>
 			</div>
 			<toolsBasicInfoForm ref="toolsBasicInfoFormRef" v-show="active === 1" @goNext="goNext" @close="close"></toolsBasicInfoForm>
-			<genInfoForm ref="genInfoFormRef" v-show="active === 2" @goNext="goNext" @close="close"></genInfoForm>
+			<genInfoForm ref="genInfoFormRef" v-show="active === 2" @goNext="goNext" @goPrev="goPrev" @close="close"></genInfoForm>
       <genTableColumns ref="tableColumnsRef" v-show="active === 3"></genTableColumns>
 			<div class="tools-footer" v-show="active === 3">
+				<el-button size="default" type="danger" @click="goPrev">上一步</el-button>
 				<el-button size="default" @click="close">关 闭</el-button>
 				<el-button type="primary" @click="onSubmit" size="default">保 存</el-button>
 			</div>
@@ -125,6 +126,8 @@ onBeforeMount(() => {
       const data: TableDataInfo = res.data.info as TableDataInfo;
       data.columns = columnsTmp;
       data.overwriteInfo = data.overwriteInfo?mergeArraysByKey([defaultOverwriteInfo,data.overwriteInfo],'key'):defaultOverwriteInfo
+			data.attachments = data.attachments??[]
+			data.attachment = data.attachments.length>0
       info.value = data;
     });
   } else {
@@ -155,6 +158,13 @@ const onSubmit = () => {
   }).catch(e=>{
     ElMessage.error(e.toString());
   });
+};
+const goPrev = () => {
+  if (active.value < 1) {
+    active.value = 3;
+  } else {
+    active.value--;
+  }
 };
 const goNext = () => {
   if (active.value > 2) {

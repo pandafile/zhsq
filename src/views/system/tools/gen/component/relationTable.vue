@@ -39,7 +39,7 @@
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column prop="updateTime" label="关联表value">
+        <el-table-column prop="updateTime" label="关联表value" v-if="hasValue">
           <template #default="scope">
             <el-select clearable filterable placeholder="请选择关联表value" v-model="scope.row.linkLabelName">
               <el-option v-for="column in scope.row.columns" :key="column.columnName" :label="column.columnName" :value="column.columnName">
@@ -72,6 +72,12 @@ import {ImportTableDataState, TableColumns, TableData} from "/@/views/system/too
 import {getRelationTable, importTable} from "/@/api/system/tools/gen";
 import {ElMessage} from "element-plus/es";
 defineOptions({ name: "relationTable"})
+const props = defineProps({
+	hasValue: {
+    type: Boolean,
+    default: true
+  }
+})
 const emit = defineEmits(['ok'])
 const queryFormRef = ref()
 const tableRef = ref()
@@ -115,14 +121,15 @@ const handleImportTable=(row:TableColumns)=>{
     ElMessage.error("请选择关联表key")
     return
   }
-  if(!row.linkLabelName){
+  if(props.hasValue && !row.linkLabelName){
     ElMessage.error("请选择关联表value")
     return
   }
   emit("ok",columnId.value,{
     linkTableName:row.tableName,
     linkLabelId:row.linkLabelId,
-    linkLabelName:row.linkLabelName
+    linkLabelName:row.linkLabelName,
+		tableId:row.tableId
   });
   visible.value = false;
 }
