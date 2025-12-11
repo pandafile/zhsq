@@ -207,15 +207,15 @@
 			</div>
 		</el-form>
 		<el-row>
-			<el-col :span="10"></el-col>
-			<el-col :span="4" class="base-footer">
-					<span>
+			<el-col :span="5"></el-col>
+			<el-col :span="14" class="base-footer">
+					<div style="display: flex;justify-content:center;align-items:center">
 						<el-button type="danger" @click="prevTip" size="default">上一步</el-button>
 						<el-button size="default" @click="close">关 闭</el-button>
 						<el-button type="primary" @click="nextTip" size="default">下一步</el-button>
-					</span>
+					</div>
 			</el-col>
-			<el-col :span="10"></el-col>
+			<el-col :span="5"></el-col>
 		</el-row>
 		<relation-table  ref="relationTableRef" @ok="setRelationTable" :hasValue=false></relation-table>
 	</el-card>

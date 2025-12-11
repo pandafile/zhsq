@@ -96,14 +96,14 @@
 				</el-row>
 			</el-form>
 			<el-row>
-				<el-col :span="10"></el-col>
-				<el-col :span="4" class="base-footer">
+				<el-col :span="5"></el-col>
+				<el-col :span="14" class="base-footer">
 					<span>
 						<el-button size="default" @click="close">关 闭</el-button>
 						<el-button type="primary" @click="nextTip" size="default">下一步</el-button>
 					</span>
 				</el-col>
-				<el-col :span="10"></el-col>
+				<el-col :span="5"></el-col>
 			</el-row>
 		</el-card>
 	</div>

@@ -86,16 +86,94 @@ export default defineComponent({
 		};
 		// 传送当前子级数据到菜单中
 		const setSendClassicChildren = (path: string) => {
-			const currentPathSplit = path.split('/');
 			let currentData: any = {};
-			filterRoutesFun(routesList.value).map((v, k) => {
-				if (v.path === `/${currentPathSplit[1]}`) {
-					v['k'] = k;
-					currentData['item'] = [{ ...v }];
-					currentData['children'] = [{ ...v }];
-					if (v.children) currentData['children'] = v.children;
+			const filteredRoutes = filterRoutesFun(routesList.value);
+
+			// 使用递归查找匹配的路由项
+			const findRouteByPath = (routes: any[], currentPath: string): any => {
+				for (const route of routes) {
+					// 直接匹配路径
+					if (route.path === currentPath) {
+						return route;
+					}
+					// 如果有子路由，递归查找
+					if (route.children && route.children.length > 0) {
+						const found = findRouteByPath(route.children, currentPath);
+						if (found) {
+							return found;
+						}
+					}
 				}
-			});
+				return null;
+			};
+
+			// 查找当前路径匹配的路由
+			const matchedRoute = findRouteByPath(filteredRoutes, path);
+
+			if (matchedRoute) {
+				// 查找顶级菜单项（即经典布局下的主菜单）
+				const findTopLevelRoute = (routes: any[], targetRoute: any): any => {
+					// 首先检查是否是顶级菜单
+					for (let k = 0; k < routes.length; k++) {
+						const route = routes[k];
+						// 直接匹配
+						if (route === targetRoute || route.path === targetRoute.path) {
+							route['k'] = k;
+							return route;
+						}
+						// 检查是否包含目标路由作为子级
+						if (route.children) {
+							const hasTargetAsChild = route.children.some((child: any) =>
+								child === targetRoute || child.path === targetRoute.path
+							);
+							if (hasTargetAsChild) {
+								route['k'] = k;
+								return route;
+							}
+						}
+					}
+
+					// 递归查找包含目标路由的顶级菜单
+					for (let k = 0; k < routes.length; k++) {
+						const route = routes[k];
+						if (route.children && route.children.length > 0) {
+							// 检查子路由中是否包含目标路由
+							const foundInChildren = findRouteByPath(route.children, targetRoute.path);
+							if (foundInChildren) {
+								route['k'] = k;
+								return route;
+							}
+						}
+					}
+
+					return null;
+				};
+
+				// 获取顶级菜单项
+				const topLevelRoute = findTopLevelRoute(filteredRoutes, matchedRoute);
+
+				if (topLevelRoute) {
+					const index = filteredRoutes.findIndex((route: any) => route.path === topLevelRoute.path);
+					topLevelRoute['k'] = index >= 0 ? index : 0;
+					currentData['item'] = [{ ...topLevelRoute }];
+					currentData['children'] = [{ ...topLevelRoute }];
+					if (topLevelRoute.children) currentData['children'] = topLevelRoute.children;
+				}
+			}
+
+			// 如果还是没有找到匹配项，使用原来的逻辑作为备选方案
+			if (Object.keys(currentData).length === 0) {
+				const currentPathSplit = path.split('/');
+				filteredRoutes.map((v, k) => {
+					if (v.path === `/${currentPathSplit[1]}`) {
+						v['k'] = k;
+						currentData['item'] = [{ ...v }];
+						currentData['children'] = [{ ...v }];
+						if (v.children) currentData['children'] = v.children;
+					}
+				});
+			}
+
 			return currentData;
 		};
 		// 设置页面当前路由高亮
