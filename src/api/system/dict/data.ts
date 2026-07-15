@@ -21,8 +21,30 @@ export function useDict(...args:string[]):ToRefs<any>{
     const res:any = ref({});
     args.forEach((d:string) => {
         res.value[d] = [];
+
+        // 优先读 localStorage 缓存（30分钟有效）
+        const cacheKey = `dict_cache_${d}`;
+        const cacheTimeKey = `${cacheKey}_time`;
+        const cached = localStorage.getItem(cacheKey);
+        const cacheTime = localStorage.getItem(cacheTimeKey);
+        if (cached && cacheTime) {
+            const age = Date.now() - parseInt(cacheTime);
+            if (age < 30 * 60 * 1000) {
+                try {
+                    res.value[d] = JSON.parse(cached);
+                    return;
+                } catch { /* 缓存损坏，重新请求 */ }
+            }
+        }
+
         getDicts(d).then(resp => {
-            res.value[d] = resp.data.values.map((p:any) =>  ({ label: p.value, value: p.key, isDefault: p.isDefault }))
+            const dictData = resp.data.values.map((p:any) =>  ({ label: p.value, value: p.key, isDefault: p.isDefault }))
+            res.value[d] = dictData;
+            // 写入缓存
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify(dictData));
+                localStorage.setItem(cacheTimeKey, Date.now().toString());
+            } catch { /* localStorage 不可用 */ }
         })
     })
     return toRefs(res.value);
