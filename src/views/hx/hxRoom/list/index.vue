@@ -25,17 +25,16 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" class="colBlock">
-                  <el-form-item label="楼栋" prop="BuildingId">
+                  <el-form-item label="小区/楼栋" prop="BuildingId">
                     <el-cascader
                       v-model="tableData.param.BuildingId"
-                      placeholder="请选择楼栋"
-                      :options="buildingIdOptions"
+                      placeholder="请选择小区和楼栋"
+                      :props="{ label:'label', value:'id', children:'children', lazy: true, lazyLoad: cascadeLoad, checkStrictly: true, emitPath: false }"
                       filterable
                       clearable
-                      :props="{ label: 'buildingName',value: 'id',checkStrictly: true,emitPath: false }"
                     />
                   </el-form-item>
-                </el-col>                
+                </el-col>
                 <el-col :span="8" :class="!showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
                     <el-button type="primary"  @click="hxRoomList"><el-icon><ele-Search /></el-icon>搜索</el-button>
@@ -236,6 +235,7 @@ import {
     updateHxRoom,        
 } from "/@/api/hx/hxRoom";
 import {listHxBuilding} from "/@/api/hx/hxBuilding";
+import {listHxCommunity} from "/@/api/hx/hxCommunity";
 import {
     HxRoomTableColumns,
     HxRoomInfoData,
@@ -307,10 +307,35 @@ const initTableData = () => {
     hxRoomList()
 };
 const linkedData = ()=>{
-    listHxBuilding({}).then((res:any)=>{
-        // el-cascader 需要带原字段的对象数组
-        buildingIdOptions.value = res.data.list??[]
-    })
+    // 懒加载模式下不需要预填 options
+}
+// 级联懒加载：小区→楼栋
+const cascadeLoad = (node: any, resolve: (nodes: any[]) => void) => {
+  if (node.level === 0) {
+    // 加载小区
+    listHxCommunity({ pageSize: 9999 }).then((res: any) => {
+      const communities = res?.data?.list ?? []
+      resolve(communities.map((c: any) => ({
+        id: `community_${c.id}`,
+        label: c.communityName,
+        isLeaf: false,
+        _communityId: c.id,
+      })))
+    }).catch(() => resolve([]))
+  } else if (node.level === 1) {
+    // 加载楼栋
+    const communityId = node.data._communityId
+    listHxBuilding({ pageSize: 9999, communityId }).then((res: any) => {
+      const buildings = res?.data?.list ?? []
+      resolve(buildings.map((b: any) => ({
+        id: b.id,
+        label: b.buildingName,
+        isLeaf: true,
+      })))
+    }).catch(() => resolve([]))
+  } else {
+    resolve([])
+  }
 }
 /** 重置按钮操作 */
 const resetQuery = (formEl: FormInstance | undefined) => {

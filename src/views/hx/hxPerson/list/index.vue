@@ -36,19 +36,6 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="楼栋" prop="buildingId">
-                    <el-cascader
-                      v-model="tableData.param.buildingId"
-                      placeholder="请选择楼栋"
-                      :options="buildingIdOptions"
-                      filterable
-                      clearable
-                      :props="{ label: 'buildingName',value: 'id',checkStrictly: true,emitPath: false }"
-                      @keyup.enter.native="hxPersonList"
-                    />
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
                   <el-form-item label="性别" prop="gender">
                     <el-select filterable v-model="tableData.param.gender" placeholder="请选择性别" clearable style="width:200px;">
                         <el-option
@@ -61,15 +48,15 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="房号" prop="roomId">
-                    <el-select filterable v-model="tableData.param.roomId" placeholder="请选择房号" clearable   style="width:200px;">
-                      <el-option                      
-                          v-for="item in roomIdOptions"                      
-                          :key="item.key"
-                          :label="item.value"
-                          :value="item.key"
-                      />
-                    </el-select>
+                  <el-form-item label="房屋地址">
+                    <el-cascader
+                      v-model="tableData.param.roomId"
+                      :props="{ label:'label', value:'id', children:'children', lazy: true, lazyLoad: cascadeLoad, checkStrictly: true, emitPath: false }"
+                      placeholder="请选择房屋地址"
+                      filterable
+                      clearable
+                      style="width:200px;"
+                    />
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
@@ -93,8 +80,8 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="居住类型" prop="personType">
-                    <el-select filterable v-model="tableData.param.personType" placeholder="请选择居住类型" clearable style="width:200px;">
+                  <el-form-item label="居住类型" prop="persontype">
+                    <el-select filterable v-model="tableData.param.persontype" placeholder="请选择居住类型" clearable style="width:200px;">
                         <el-option
                             v-for="dict in personType"
                             :key="dict.value"
@@ -127,50 +114,50 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="基础信息（JSON格式）" prop="basicInfo">
+                  <el-form-item label="基础信息" prop="basicInfo">
                     <el-input
                         v-model="tableData.param.basicInfo"
-                        placeholder="请输入基础信息（JSON格式）"
+                        placeholder="请输入基础信息"
                         clearable                        
                         @keyup.enter.native="hxPersonList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="特殊标签（JSON数组）" prop="specialTags">
+                  <el-form-item label="特殊标签" prop="specialTags">
                     <el-input
                         v-model="tableData.param.specialTags"
-                        placeholder="请输入特殊标签（JSON数组）"
+                        placeholder="请输入特殊标签"
                         clearable                        
                         @keyup.enter.native="hxPersonList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="健康信息（JSON格式）" prop="healthInfo">
+                  <el-form-item label="健康信息" prop="healthInfo">
                     <el-input
                         v-model="tableData.param.healthInfo"
-                        placeholder="请输入健康信息（JSON格式）"
+                        placeholder="请输入健康信息"
                         clearable                        
                         @keyup.enter.native="hxPersonList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="家庭信息（JSON格式）" prop="familyInfo">
+                  <el-form-item label="家庭信息" prop="familyInfo">
                     <el-input
                         v-model="tableData.param.familyInfo"
-                        placeholder="请输入家庭信息（JSON格式）"
+                        placeholder="请输入家庭信息"
                         clearable                        
                         @keyup.enter.native="hxPersonList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="社保信息（JSON格式）" prop="socialInfo">
+                  <el-form-item label="社保信息" prop="socialInfo">
                     <el-input
                         v-model="tableData.param.socialInfo"
-                        placeholder="请输入社保信息（JSON格式）"
+                        placeholder="请输入社保信息"
                         clearable                        
                         @keyup.enter.native="hxPersonList"
                     />                    
@@ -254,7 +241,7 @@
             </el-row>
         </div>
         <el-table v-loading="loading" :data="tableData.data" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" align="center" />          
+          <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="主键ID" align="center" prop="id"
             min-width="150px"            
              />          
@@ -262,18 +249,20 @@
             min-width="150px"            
              />          
           <el-table-column label="性别" align="center" prop="gender" :formatter="genderFormat"
-            min-width="100px"            
-             />          
-          <el-table-column label="房屋地址" align="center" prop="linkedRoomId.roomName"
             min-width="150px"            
              />          
+          <el-table-column label="房屋地址" align="center" min-width="150px">
+            <template #default="scope">
+              <span>{{ [scope.row.linkedRoomId?.buildingName, scope.row.linkedRoomId?.roomNo].filter(Boolean).join('') || '-' }}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="身份证号" align="center" prop="idCard"
-            min-width="180px"            
+            min-width="150px"            
              />          
           <el-table-column label="手机号" align="center" prop="phone"
             min-width="150px"            
              />          
-          <el-table-column label="居住类型" align="center" prop="personType" :formatter="personTypeFormat"
+          <el-table-column label="居住类型" align="center" prop="persontype" :formatter="persontypeFormat"
             min-width="150px"            
              />          
           <el-table-column label="出生日期" align="center" prop="birthday"
@@ -286,38 +275,87 @@
           <el-table-column label="民族" align="center" prop="nation"
             min-width="150px"            
              />          
-       
           <el-table-column label="基础信息" align="left" prop="basicInfo" min-width="200px">
             <template #default="scope">
-                <div v-if="scope.row.basicInfo">
-                    <el-tag
-                            v-for="(value, key) in parseJson(scope.row.basicInfo)"
-                            :key="key"
-                            size="small"
-                            style="margin: 2px"
-                            >
-                        {{key}}:{{ value }}
-                  
-                    </el-tag> 
-                </div>
-                <span v-else>-</span>
+              <div v-if="scope.row.basicInfo">
+                <el-tag
+                  v-for="(value, key) in parseJson(scope.row.basicInfo)"
+                  :key="key"
+                  size="small"
+                  style="margin: 2px"
+                >{{ key }}:{{ value }}</el-tag>
+              </div>
+              <span v-else>-</span>
             </template>
-        </el-table-column>
-                  <el-table-column label="特殊信息" align="left" prop="specialTags" min-width="200px">
+          </el-table-column>
+          <el-table-column label="特殊标签" align="left" prop="specialTags" min-width="200px">
             <template #default="scope">
-                <div v-if="scope.row.basicInfo">
-                    <el-tag
-                            v-for="(value, key) in parseJson(scope.row.specialTags)"
-                            :key="key"
-                            size="small"
-                            style="margin: 2px"
-                            >
-                        {{ value }}
-                    </el-tag> 
-                </div>
-                <span v-else>-</span>
+              <div v-if="scope.row.specialTags">
+                <el-tag
+                  v-for="(value, key) in parseJson(scope.row.specialTags)"
+                  :key="key"
+                  size="small"
+                  style="margin: 2px"
+                >{{ value }}</el-tag>
+              </div>
+              <span v-else>-</span>
             </template>
-        </el-table-column>
+          </el-table-column>
+          <el-table-column label="健康信息" align="left" prop="healthInfo" min-width="200px">
+            <template #default="scope">
+              <div v-if="scope.row.healthInfo">
+                <el-tag
+                  v-for="(value, key) in parseJson(scope.row.healthInfo)"
+                  :key="key"
+                  size="small"
+                  style="margin: 2px"
+                >{{ value }}</el-tag>
+              </div>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="家庭信息" align="left" prop="familyInfo" min-width="200px">
+            <template #default="scope">
+              <div v-if="scope.row.familyInfo">
+                <el-tag
+                  v-for="(value, key) in parseJson(scope.row.familyInfo)"
+                  :key="key"
+                  size="small"
+                  style="margin: 2px"
+                >{{ value }}</el-tag>
+              </div>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="社保信息" align="left" prop="socialInfo" min-width="200px">
+            <template #default="scope">
+              <div v-if="scope.row.socialInfo">
+                <el-tag
+                  v-for="(value, key) in parseJson(scope.row.socialInfo)"
+                  :key="key"
+                  size="small"
+                  style="margin: 2px"
+                >{{ value }}</el-tag>
+              </div>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="备注" align="center" prop="remark"
+            min-width="150px"            
+             />          
+          <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat"
+            min-width="150px"            
+             />          
+          <el-table-column label="创建人" align="center" prop="createdBy"
+            min-width="150px"            
+             />          
+          <el-table-column label="创建时间" align="center" prop="createdAt"
+            min-width="150px"            
+            >
+            <template #default="scope">
+                <span>{{ proxy.parseTime(scope.row.createdAt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+            </template>
+          </el-table-column>        
           <el-table-column label="操作" align="center" class-name="small-padding" min-width="200px" fixed="right">
             <template #default="scope">            
               <el-button
@@ -352,8 +390,7 @@
     <ApiV1HxHxPersonEdit
        ref="editRef"       
        :genderOptions="sys_user_sex"       
-       :roomIdOptions="roomIdOptions"       
-       :personTypeOptions="personType"       
+       :persontypeOptions="personType"       
        :statusOptions="hx_status"       
        @hxPersonList="hxPersonList"
     ></ApiV1HxHxPersonEdit>
@@ -361,7 +398,7 @@
       ref="detailRef"      
       :genderOptions="sys_user_sex"      
       :roomIdOptions="roomIdOptions"      
-      :personTypeOptions="personType"      
+      :persontypeOptions="personType"      
       :statusOptions="hx_status"      
       @hxPersonList="hxPersonList"
     ></ApiV1HxHxPersonDetail>    
@@ -371,6 +408,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import {ItemOptions} from "/@/api/items";
 import {toRefs, reactive, onMounted, ref, defineComponent, computed,getCurrentInstance,toRaw} from 'vue';
 import {ElMessageBox, ElMessage, FormInstance} from 'element-plus';
 import {
@@ -378,19 +416,23 @@ import {
     getHxPerson,
     delHxPerson,
     addHxPerson,
-    updateHxPerson,        
+    updateHxPerson,    
+    linkedDataSearch    
 } from "/@/api/hx/hxPerson";
-import {listHxRoom} from "/@/api/hx/hxRoom";
-import {listHxBuilding} from "/@/api/hx/hxBuilding";
+import { listHxCommunity } from "/@/api/hx/hxCommunity";
+import { listHxBuilding } from "/@/api/hx/hxBuilding";
+import { listHxRoom } from "/@/api/hx/hxRoom";
 import {
     HxPersonTableColumns,
     HxPersonInfoData,
-    HxPersonTableDataState,        
+    HxPersonTableDataState,    
+    LinkedHxPersonHxRoom,    
 } from "/@/views/hx/hxPerson/list/component/model"
 import ApiV1HxHxPersonEdit from "/@/views/hx/hxPerson/list/component/edit.vue"
 import ApiV1HxHxPersonDetail from "/@/views/hx/hxPerson/list/component/detail.vue"
 import {downLoadXml} from "/@/utils/zipdownload";
 import loadExcel from "/@/components/loadExcel/index.vue"
+import getHxRoom from "/@/api/hx/hxRoom"
 defineOptions({ name: "apiV1HxHxPersonList"})
 const {proxy} = <any>getCurrentInstance()
 const loading = ref(false)
@@ -422,10 +464,8 @@ const {
     'personType',    
     'hx_status',    
 )
-// roomIdOptions关联表数据
-const roomIdOptions = ref<Array<{key:string,value:string}>>([])
-// buildingIdOptions关联表数据
-const buildingIdOptions = ref<Array<any>>([])
+// roomIdOptions关联表数据（子组件编辑/详情用）
+const roomIdOptions = ref<Array<ItemOptions>>([])
 const state = reactive<HxPersonTableDataState>({
     ids:[],
     tableData: {
@@ -436,13 +476,12 @@ const state = reactive<HxPersonTableDataState>({
             pageNum: 1,
             pageSize: 10,            
             id: undefined,            
-            buildingId: undefined,            
             name: undefined,            
             gender: undefined,            
             roomId: undefined,            
             idCard: undefined,            
             phone: undefined,            
-            personType: undefined,            
+            persontype: undefined,            
             birthday: undefined,            
             nation: undefined,            
             basicInfo: undefined,            
@@ -457,7 +496,6 @@ const state = reactive<HxPersonTableDataState>({
         },
     },
 });
-
 const { tableData } = toRefs(state);
 // 页面加载时
 onMounted(() => {
@@ -465,9 +503,55 @@ onMounted(() => {
 });
 // 初始化表格数据
 const initTableData = () => {    
+    linkedData()    
     hxPersonList()
 };
-
+const linkedData = async () => {
+  // 子组件编辑/详情页仍然需要 roomIdOptions
+  linkedDataSearch().then((res:any)=>{
+    roomIdOptions.value = proxy.setItems(res, 'id', 'roomNo','linkedHxPersonHxRoom')
+  })
+}
+// 级联懒加载：全部由 lazyLoad 控制
+const cascadeLoad = (node: any, resolve: (nodes: any[]) => void) => {
+  if (node.level === 0) {
+    // 加载小区
+    listHxCommunity({ pageSize: 9999 }).then((res: any) => {
+      const communities = res?.data?.list ?? []
+      resolve(communities.map((c: any) => ({
+        id: `community_${c.id}`,
+        label: c.communityName,
+        isLeaf: false,
+        _communityId: c.id,
+      })))
+    }).catch(() => resolve([]))
+  } else if (node.level === 1) {
+    // 加载楼栋
+    const communityId = node.data._communityId
+    listHxBuilding({ pageSize: 9999, communityId }).then((res: any) => {
+      const buildings = res?.data?.list ?? []
+      resolve(buildings.map((b: any) => ({
+        id: `building_${b.id}`,
+        label: b.buildingName,
+        isLeaf: false,
+        _buildingId: b.id,
+      })))
+    }).catch(() => resolve([]))
+  } else if (node.level === 2) {
+    // 加载房间
+    const buildingId = node.data._buildingId
+    listHxRoom({ pageSize: 9999, buildingId }).then((res: any) => {
+      const rooms = res?.data?.list ?? []
+      resolve(rooms.map((r: any) => ({
+        id: r.id,
+        label: r.roomNo,
+        isLeaf: true,
+      })))
+    }).catch(() => resolve([]))
+  } else {
+    resolve([])
+  }
+}
 /** 重置按钮操作 */
 const resetQuery = (formEl: FormInstance | undefined) => {
     if (!formEl) return
@@ -479,7 +563,6 @@ const hxPersonList = ()=>{
   loading.value = true
   listHxPerson(state.tableData.param).then((res:any)=>{
     let list = res.data.list??[];    
-    console.log(list)
     list.map((item:any)=>{        
         item.createdBy = item.createdUser?.userNickname        
     })    
@@ -491,19 +574,23 @@ const hxPersonList = ()=>{
 const toggleSearch = () => {
     showAll.value = !showAll.value;
 }
-
-
 // 性别字典翻译
 const genderFormat = (row:HxPersonTableColumns) => {
     return proxy.selectDictLabel(sys_user_sex.value, row.gender);
 }
 // 居住类型字典翻译
-const personTypeFormat = (row:HxPersonTableColumns) => {
-    return proxy.selectDictLabel(personType.value, row.personType);
+const persontypeFormat = (row:HxPersonTableColumns) => {
+
+    return proxy.selectDictLabel(personType.value, row.persontype);
 }
 // 状态字典翻译
 const statusFormat = (row:HxPersonTableColumns) => {
     return proxy.selectDictLabel(hx_status.value, row.status);
+}
+
+const roomName=(row:HxPersonTableColumns)=>{
+  console.log(row)
+  //  getHxRoom()
 }
 // 多选框选中数据
 const handleSelectionChange = (selection:Array<HxPersonInfoData>) => {
@@ -558,7 +645,6 @@ const handleExport = ()=>{
 const handleImport=()=>{
     loadExcelHxPersonRef.value.open()
 }
-
 const parseJson = (str: string): Record<string, any> => {
   if (!str) return {};
   try {
@@ -577,11 +663,4 @@ const parseJson = (str: string): Record<string, any> => {
         display: none;
     }
     .ml-2{margin: 3px;}
-    .json-cell{
-        display:inline-block;
-        max-width:200px;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap;
-    }
 </style>

@@ -38,10 +38,10 @@
           <el-descriptions-item :span="1">                  
                     <template #label>
                       <div class="cell-item">
-                        房号
+                        房屋地址
                       </div>
                     </template>
-                    {{ formData.linkedRoomId?formData.linkedRoomId.roomNo:'' }}            
+                    {{ [formData.linkedRoomId?.buildingName, formData.linkedRoomId?.roomNo].filter(Boolean).join('') || '-' }}            
           </el-descriptions-item>        
           <el-descriptions-item :span="1">            
               <template #label>
@@ -65,7 +65,7 @@
                     居住类型
                   </div>
                 </template>
-                {{ proxy.getOptionValue(formData.personType, personTypeOptions,'value','label') }}            
+                {{ proxy.getOptionValue(formData.persontype, persontypeOptions,'value','label') }}            
           </el-descriptions-item>        
           <el-descriptions-item :span="1">
             <template #label>
@@ -83,45 +83,45 @@
               </template>
               {{ formData.nation }}            
           </el-descriptions-item>        
-          <el-descriptions-item :span="1" :contentStyle="{'max-height':'200px','overflow-y':'auto'}">            
+          <el-descriptions-item :span="1">            
               <template #label>
                 <div class="cell-item">
                   基础信息
                 </div>
               </template>
-              <pre style="margin:0;white-space:pre-wrap;">{{ formatJSON(formData.basicInfo) }}</pre>            
+              {{ formData.basicInfo }}            
           </el-descriptions-item>        
-          <el-descriptions-item :span="1" :contentStyle="{'max-height':'200px','overflow-y':'auto'}">            
+          <el-descriptions-item :span="1">            
               <template #label>
                 <div class="cell-item">
                   特殊标签
                 </div>
               </template>
-              <pre style="margin:0;white-space:pre-wrap;">{{ formatJSON(formData.specialTags) }}</pre>            
+              {{ formData.specialTags }}            
           </el-descriptions-item>        
-          <el-descriptions-item :span="1" :contentStyle="{'max-height':'200px','overflow-y':'auto'}">            
+          <el-descriptions-item :span="1">            
               <template #label>
                 <div class="cell-item">
                   健康信息
                 </div>
               </template>
-              <pre style="margin:0;white-space:pre-wrap;">{{ formatJSON(formData.healthInfo) }}</pre>            
+              {{ formData.healthInfo }}            
           </el-descriptions-item>        
-          <el-descriptions-item :span="1" :contentStyle="{'max-height':'200px','overflow-y':'auto'}">            
+          <el-descriptions-item :span="1">            
               <template #label>
                 <div class="cell-item">
                   家庭信息
                 </div>
               </template>
-              <pre style="margin:0;white-space:pre-wrap;">{{ formatJSON(formData.familyInfo) }}</pre>            
+              {{ formData.familyInfo }}            
           </el-descriptions-item>        
-          <el-descriptions-item :span="1" :contentStyle="{'max-height':'200px','overflow-y':'auto'}">            
+          <el-descriptions-item :span="1">            
               <template #label>
                 <div class="cell-item">
                   社保信息
                 </div>
               </template>
-              <pre style="margin:0;white-space:pre-wrap;">{{ formatJSON(formData.socialInfo) }}</pre>            
+              {{ formData.socialInfo }}            
           </el-descriptions-item>        
           <el-descriptions-item :span="1">            
               <template #label>
@@ -193,7 +193,7 @@
       type:Array,
       default:()=>[]
     },    
-    personTypeOptions:{
+    persontypeOptions:{
       type:Array,
       default:()=>[]
     },    
@@ -203,14 +203,6 @@
     },    
   })  
   const {proxy} = <any>getCurrentInstance()
-  const formatJSON = (val: string) => {
-      if (!val) return ''
-      try {
-          return JSON.stringify(JSON.parse(val), null, 2)
-      } catch {
-          return val
-      }
-  }
   const formRef = ref<HTMLElement | null>(null);
   const menuRef = ref();  
   const state = reactive<HxPersonEditState>({
@@ -224,7 +216,7 @@
       linkedRoomId:{id:undefined,roomNo:undefined },      
       idCard: undefined,      
       phone: undefined,      
-      personType: false ,      
+      persontype: undefined,      
       birthday: undefined,      
       nation: undefined,      
       basicInfo: undefined,      
@@ -247,12 +239,6 @@
     rules: {      
       id : [
           { required: true, message: "主键ID不能为空", trigger: "blur" }
-      ],      
-      name : [
-          { required: true, message: "姓名不能为空", trigger: "blur" }
-      ],      
-      status : [
-          { required: true, message: "状态不能为空", trigger: "blur" }
       ],      
     }
   });
@@ -290,7 +276,7 @@
       linkedRoomId:{id:undefined,roomNo:undefined },      
       idCard: undefined,      
       phone: undefined,      
-      personType: false ,      
+      persontype: undefined,      
       birthday: undefined,      
       nation: undefined,      
       basicInfo: undefined,      

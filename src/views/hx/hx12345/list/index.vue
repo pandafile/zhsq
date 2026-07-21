@@ -326,8 +326,18 @@
                         type="warning"
                         @click="handleExport()"
                         v-auth="'api/v1/hx/hx12345/export'"
-                ><el-icon><ele-Download /></el-icon>登录</el-button>
-             </el-col>       
+                ><el-icon><ele-Download /></el-icon>导出Excel</el-button>
+             </el-col>
+             <el-col :span="1.5">
+                <el-button type="info" @click="handleMinyiLogin">
+                  <el-icon><ele-User /></el-icon>{{ miyiStaus }}
+                </el-button>
+              </el-col>
+              <el-col :span="1.5">
+                <el-button type="primary" @click="handleViewUpdate">
+                  <el-icon><ele-User /></el-icon>数据同步
+                </el-button>
+              </el-col>
             </el-row>
         </div>
         <el-table v-loading="loading" :data="tableData.data" @selection-change="handleSelectionChange">
@@ -380,8 +390,6 @@
           <el-table-column label="联系电话" align="center" prop="contactPhone"
             min-width="150px"            
              />          
-    
-      
           <el-table-column label="备注" align="center" prop="notes"
             min-width="150px"            
              />        
@@ -416,6 +424,8 @@
             @pagination="hx12345List"
         />
     </el-card>
+    <!-- 民意平台登录弹窗 -->
+    <MinYiLogin :show="showMinYiLogin" @close="showMinYiLogin = false" @login-success="onMinYiLoginSuccess" />
     <ApiV1HxHx12345Edit
        ref="editRef"       
        :communityIdOptions="communityIdOptions"       
@@ -455,8 +465,35 @@ import ApiV1HxHx12345Edit from "/@/views/hx/hx12345/list/component/edit.vue"
 import ApiV1HxHx12345Detail from "/@/views/hx/hx12345/list/component/detail.vue"
 import Hx12345FilterPanel from "/@/views/hx/hx12345/list/component/filterPanel.vue"
 import {downLoadXml} from "/@/utils/zipdownload";
+import MinYiLogin from '/@/views/hx/hx12345/list/component/minyiLogin.vue';
+import { isMinyiTokenValid, pageQuery, mapPlatformToDb, pageQueryList } from '/@/api/hx/minyi';
+import { Session, Local } from '/@/utils/storage';
+import { number } from "echarts";
 defineOptions({ name: "apiV1HxHx12345List"})
 const {proxy} = <any>getCurrentInstance()
+
+// 检查民意 token 状态并更新按钮文字
+const checkMinyiTokenStatus = () => {
+  miyiStaus.value = isMinyiTokenValid() ? '已登录' : '民意登录'
+}
+
+const miyiStaus = ref('民意登录')
+const showMinYiLogin = ref(false)
+
+// 民意平台登录成功回调
+const onMinYiLoginSuccess = () => {
+  miyiStaus.value = '已登录'
+}
+
+// 按钮点击 - token 有效时不弹出登录框
+const handleMinyiLogin = () => {
+  if (isMinyiTokenValid()) {
+    ElMessage.info('民意平台已登录，token 仍有效')
+    return
+  }
+  showMinYiLogin.value = true
+}
+
 const loading = ref(false)
 const queryRef = ref()
 const editRef = ref();
@@ -540,6 +577,7 @@ const onFilterChange = (val: { communityId: any; handlePerson: any; itemStatus: 
 // 页面加载时
 onMounted(() => {
     initTableData();
+    checkMinyiTokenStatus();
 });
 // 初始化表格数据
 const initTableData = () => {    
@@ -628,9 +666,116 @@ const handleDelete = (row: Hx12345TableColumns|null) => {
 const handleView = (row:Hx12345TableColumns)=>{
     detailRef.value.openDialog(toRaw(row));
 }
-//导出excel
+// 导出excel
 const handleExport = ()=>{
     downLoadXml('/api/v1/hx/hx12345/export',state.tableData.param,'get')
+}
+
+const handledata={
+  currentPage:1,
+  pageSize:300,
+  taskStatus:"",
+  isSuggest:"0",
+}
+const handleViewUpdate = async () => {
+  const token = Local.get('minyiToken')
+  if (!token?.accessToken) {
+    ElMessage.warning('未登录民意平台')
+    return
+  }
+
+  loading.value = true
+  try {
+    // 1) 取本地数据库现有 orderNo
+    const localRes: any = await listHx12345({ pageNum: 1, pageSize: 99999 })
+    const existingOrderNos = new Set(
+      (localRes.data.list || []).map((item: any) => item.orderNo)
+    )
+
+    // 2) 并行拉取平台 5 个状态
+    const statuses = ['1', '2', '3', '4', '5']
+    const results = await Promise.all(
+      statuses.map(s => pageQuery({ ...handledata, taskStatus: s }, token.accessToken))
+    )
+
+    // 3) 合并 + 过滤，带上对应的 taskStatus
+    const platformList = results
+      .flatMap((r, i) => (r?.data?.records ?? []).map((record: any) => ({
+        ...record,
+        _taskStatus: statuses[i]
+      })))
+      .filter((it: any) => it.petitionNumber && !existingOrderNos.has(it.petitionNumber))
+
+    if (platformList.length === 0) {
+      ElMessage.info('没有新数据需要同步')
+      return
+    }
+
+    // 4) 用 pageQueryList 按 petitionNumber 逐一补充详细字段
+    for (const item of platformList) {
+      try {
+        const detailRes = await pageQueryList({
+          currentPage: 1,
+          pageSize: 10,
+          petitionLocationAddress: '',
+          petitionClassification: '',
+          petitionTagLabels: [],
+          petitionFlagLabels: [],
+          petitionStatusLabels: [],
+          petitionProcessLabels: [],
+          petitionNumber: item.petitionNumber,
+          petitionContent: null,
+          nextOrgId: '',
+          areaCode: '',
+          overdueStatus: '',
+          overdueType: '',
+          reportFlag: '',
+          areaDataSwitch: '1'
+        }, token.accessToken)
+        const detail = detailRes?.data?.records?.[0]
+        if (detail) {
+          // 把 pageQuery 可能缺失的字段补上
+          item.petitionTitle = item.petitionTitle || detail.petitionTitle
+          item.petitionContent = item.petitionContent || detail.petitionContent
+          item.petitionSource = item.petitionSource || detail.petitionSource
+          item.petitionUserName = item.petitionUserName || detail.petitionUserName
+          item.petitionUserPhone = item.petitionUserPhone || detail.petitionUserPhone
+          item.petitionLocationAddress = item.petitionLocationAddress || detail.petitionLocationAddress
+          item.petitionLocationSupplement = item.petitionLocationSupplement || detail.petitionLocationSupplement
+          item.contentClassification = item.contentClassification || detail.contentClassification
+          item.registerTime = item.registerTime || detail.registerTime
+          item.isUrgent = item.isUrgent || detail.isUrgent
+          item.limitedProcessingDeadline = item.limitedProcessingDeadline || detail.limitedProcessingDeadline
+          item.petitionFeedback = item.petitionFeedback || detail.petitionFeedback
+          item.petitionYangyan = item.petitionYangyan || detail.petitionYangyan
+          item.petitionAmi = item.petitionAmi || detail.petitionAmi
+          item.petitionAml = item.petitionAml || detail.petitionAml
+        }
+      } catch (e) {
+        console.warn('补充详情失败，跳过:', item.petitionNumber, e)
+      }
+      // 留白字段，供手动填写
+      item._communityId = undefined
+      item._handlePerson = undefined
+    }
+
+    // 5) 逐条插入
+    let ok = 0, fail = 0
+    for (const item of platformList) {
+      try {
+        await addHx12345(mapPlatformToDb(item))
+        ok++
+      } catch (e) {
+        console.error('同步失败:', item.petitionNumber, e)
+        fail++
+      }
+    }
+
+    ElMessage.success(`同步完成：成功 ${ok} 条，失败 ${fail} 条`)
+    hx12345List() // 刷新本地表格
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 <style lang="scss" scoped>

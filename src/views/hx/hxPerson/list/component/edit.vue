@@ -19,50 +19,31 @@
             ></el-option>
           </el-select>
         </el-form-item>          
-        <el-form-item label="小区" prop="communityId">
-          <el-select filterable clearable v-model="selectCommunityId" placeholder="请选择小区" @change="onCommunityChange">
-            <el-option
-              v-for="item in communityOptions"
-              :key="item.id"
-              :label="item.communityName"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="建筑" prop="buildingId">
-          <el-select filterable clearable v-model="selectBuildingId" placeholder="请选择建筑" @change="onBuildingChange">
-            <el-option
-              v-for="item in buildingOptions"
-              :key="item.id"
-              :label="item.buildingName"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="房号" prop="roomId">
-          <el-select filterable clearable v-model="formData.roomId" placeholder="请选择房号">
-            <el-option
-              v-for="item in roomOptions"
-              :key="item.id"
-              :label="item.roomNo"
-              :value="item.id"
-            />
-          </el-select>
+        <el-form-item label="房屋地址" prop="roomId">
+          <el-cascader
+            v-model="formData.roomId"
+            :props="{ label:'label', value:'id', children:'children', lazy: true, lazyLoad: cascadeLoad, checkStrictly: true, emitPath: false }"
+            placeholder="请选择房屋地址"
+            filterable
+            clearable
+            style="width:200px;"
+          />
         </el-form-item>        
         <el-form-item label="身份证号" prop="idCard">
           <el-input v-model="formData.idCard" placeholder="请输入身份证号" />
         </el-form-item>        
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="formData.phone" placeholder="请输入手机号" />
-        </el-form-item>        
-        <el-form-item label="居住类型" prop="personType">
-          <el-radio-group v-model="formData.personType">
-            <el-radio
-              v-for="dict in personTypeOptions"
+        </el-form-item>          
+        <el-form-item label="居住类型" prop="persontype">
+          <el-select filterable clearable v-model="formData.persontype" placeholder="请选择居住类型" >
+            <el-option
+              v-for="dict in persontypeOptions"
               :key="dict.value"
-              :value="dict.value"
-            >{{dict.label }}</el-radio>
-          </el-radio-group>
+              :label="dict.label"              
+                  :value="dict.value"              
+            ></el-option>
+          </el-select>
         </el-form-item>        
         <el-form-item label="出生日期" prop="birthday">
           <el-date-picker clearable  style="width: 200px"
@@ -75,20 +56,20 @@
         <el-form-item label="民族" prop="nation">
           <el-input v-model="formData.nation" placeholder="请输入民族" />
         </el-form-item>        
-        <el-form-item label="基础信息（JSON格式）" prop="basicInfo">
-          <el-input v-model="formData.basicInfo" type="textarea" placeholder="请输入基础信息（JSON格式）" />
+        <el-form-item label="基础信息" prop="basicInfo">
+          <el-input v-model="formData.basicInfo" type="textarea" placeholder="请输入基础信息" />
         </el-form-item>        
-        <el-form-item label="特殊标签（JSON数组）" prop="specialTags">
-          <el-input v-model="formData.specialTags" type="textarea" placeholder="请输入特殊标签（JSON数组）" />
+        <el-form-item label="特殊标签" prop="specialTags">
+          <el-input v-model="formData.specialTags" type="textarea" placeholder="请输入特殊标签" />
         </el-form-item>        
-        <el-form-item label="健康信息（JSON格式）" prop="healthInfo">
-          <el-input v-model="formData.healthInfo" type="textarea" placeholder="请输入健康信息（JSON格式）" />
+        <el-form-item label="健康信息" prop="healthInfo">
+          <el-input v-model="formData.healthInfo" type="textarea" placeholder="请输入健康信息" />
         </el-form-item>        
-        <el-form-item label="家庭信息（JSON格式）" prop="familyInfo">
-          <el-input v-model="formData.familyInfo" type="textarea" placeholder="请输入家庭信息（JSON格式）" />
+        <el-form-item label="家庭信息" prop="familyInfo">
+          <el-input v-model="formData.familyInfo" type="textarea" placeholder="请输入家庭信息" />
         </el-form-item>        
-        <el-form-item label="社保信息（JSON格式）" prop="socialInfo">
-          <el-input v-model="formData.socialInfo" type="textarea" placeholder="请输入社保信息（JSON格式）" />
+        <el-form-item label="社保信息" prop="socialInfo">
+          <el-input v-model="formData.socialInfo" type="textarea" placeholder="请输入社保信息" />
         </el-form-item>        
         <el-form-item label="备注" prop="remark">
           <el-input v-model="formData.remark" placeholder="请输入备注" />
@@ -122,9 +103,9 @@ import {
   addHxPerson,
   updateHxPerson,  
 } from "/@/api/hx/hxPerson";
-import {listHxCommunity} from "/@/api/hx/hxCommunity";
-import {getHxBuilding, listHxBuilding} from "/@/api/hx/hxBuilding";
-import {getHxRoom, listHxRoom} from "/@/api/hx/hxRoom";
+import { listHxCommunity } from "/@/api/hx/hxCommunity";
+import { listHxBuilding } from "/@/api/hx/hxBuilding";
+import { listHxRoom } from "/@/api/hx/hxRoom";
 import {
   HxPersonTableColumns,
   HxPersonInfoData,
@@ -142,7 +123,7 @@ const emit = defineEmits(['hxPersonList'])
       type:Array,
       default:()=>[]
     },    
-    personTypeOptions:{
+    persontypeOptions:{
       type:Array,
       default:()=>[]
     },    
@@ -154,12 +135,6 @@ const emit = defineEmits(['hxPersonList'])
 const {proxy} = <any>getCurrentInstance()
 const formRef = ref<HTMLElement | null>(null);
 const menuRef = ref();
-// 三级联级选择状态
-const selectCommunityId = ref<number|undefined>(undefined)
-const selectBuildingId = ref<number|undefined>(undefined)
-const communityOptions = ref<Array<any>>([])
-const buildingOptions = ref<Array<any>>([])
-const roomOptions = ref<Array<any>>([])
 const state = reactive<HxPersonEditState>({
   loading:false,
   isShowDialog: false,
@@ -170,7 +145,7 @@ const state = reactive<HxPersonEditState>({
     roomId: undefined,    
     idCard: undefined,    
     phone: undefined,    
-    personType: undefined,    
+    persontype: undefined,    
     birthday: undefined,    
     nation: undefined,    
     basicInfo: undefined,    
@@ -194,76 +169,22 @@ const state = reactive<HxPersonEditState>({
     id : [
         { required: true, message: "主键ID不能为空", trigger: "blur" }
     ],    
-    name : [
-        { required: true, message: "姓名不能为空", trigger: "blur" }
-    ],    
-    status : [
-        { required: true, message: "状态不能为空", trigger: "blur" }
-    ],    
   }
 });
 const { loading,isShowDialog,formData,rules } = toRefs(state);
-// 加载小区选项
-const loadCommunities = () => {
-  listHxCommunity({}).then((res: any) => {
-    communityOptions.value = res.data.list ?? []
-  })
-}
-// 小区切换 - 加载建筑
-const onCommunityChange = (val: number|undefined) => {
-  selectBuildingId.value = undefined
-  roomOptions.value = []
-  state.formData.roomId = undefined
-  if (!val) {
-    buildingOptions.value = []
-    return
-  }
-  listHxBuilding({communityId: val}).then((res: any) => {
-    buildingOptions.value = res.data.list ?? []
-  })
-}
-// 建筑切换 - 加载房号
-const onBuildingChange = (val: number|undefined) => {
-  state.formData.roomId = undefined
-  roomOptions.value = []
-  if (!val) return
-  listHxRoom({buildingId: val}).then((res: any) => {
-    roomOptions.value = res.data.list ?? []
-  })
-}
 // 打开弹窗
 const openDialog = (row?: HxPersonInfoData) => {
   resetForm();
-  loadCommunities()
   if(row) {
     getHxPerson(row.id!).then((res:any)=>{
       const data = res.data;      
       data.gender = ''+data.gender      
       data.roomId = ''+data.roomId      
-      data.personType = ''+data.personType      
+      data.persontype = ''+data.persontype      
       data.status = ''+data.status      
       state.formData = data;
-      // 级联回填：roomId → buildingId → communityId
-      if (data.roomId) {
-        getHxRoom(parseInt(data.roomId)).then((roomRes: any) => {
-          const room = roomRes.data
-          selectBuildingId.value = room.buildingId
-          getHxBuilding(room.buildingId).then((buildingRes: any) => {
-            const building = buildingRes.data
-            selectCommunityId.value = building.communityId
-            // 加载当前小区的建筑列表
-            listHxBuilding({communityId: building.communityId}).then((bRes: any) => {
-              buildingOptions.value = bRes.data.list ?? []
-            })
-            // 加载当前建筑的房号列表
-            listHxRoom({buildingId: room.buildingId}).then((rRes: any) => {
-              roomOptions.value = rRes.data.list ?? []
-            })
-          })
-        })
-      }
-    })
-  }
+  })
+}
   state.isShowDialog = true;
 };
 // 关闭弹窗
@@ -314,7 +235,7 @@ const resetForm = ()=>{
     roomId: undefined,    
     idCard: undefined,    
     phone: undefined,    
-    personType: '' ,    
+    persontype: undefined,    
     birthday: undefined,    
     nation: undefined,    
     basicInfo: undefined,    
@@ -333,13 +254,45 @@ const resetForm = ()=>{
       roomNo:undefined,    // 房号      
     },    
   }  
-  // 重置级联选择状态
-  selectCommunityId.value = undefined
-  selectBuildingId.value = undefined
-  communityOptions.value = []
-  buildingOptions.value = []
-  roomOptions.value = []
 };
+// 级联懒加载：全部由 lazyLoad 控制
+const cascadeLoad = (node: any, resolve: (nodes: any[]) => void) => {
+  if (node.level === 0) {
+    // 加载小区
+    listHxCommunity({ pageSize: 9999 }).then((res: any) => {
+      const communities = res?.data?.list ?? []
+      resolve(communities.map((c: any) => ({
+        id: `community_${c.id}`,
+        label: c.communityName,
+        isLeaf: false,
+        _communityId: c.id,
+      })))
+    }).catch(() => resolve([]))
+  } else if (node.level === 1) {
+    const communityId = node.data._communityId
+    listHxBuilding({ pageSize: 9999, communityId }).then((res: any) => {
+      const buildings = res?.data?.list ?? []
+      resolve(buildings.map((b: any) => ({
+        id: `building_${b.id}`,
+        label: b.buildingName,
+        isLeaf: false,
+        _buildingId: b.id,
+      })))
+    }).catch(() => resolve([]))
+  } else if (node.level === 2) {
+    const buildingId = node.data._buildingId
+    listHxRoom({ pageSize: 9999, buildingId }).then((res: any) => {
+      const rooms = res?.data?.list ?? []
+      resolve(rooms.map((r: any) => ({
+        id: r.id,
+        label: r.roomNo,
+        isLeaf: true,
+      })))
+    }).catch(() => resolve([]))
+  } else {
+    resolve([])
+  }
+}
 </script>
 <style scoped>  
   .kv-label{margin-bottom: 15px;font-size: 14px;}

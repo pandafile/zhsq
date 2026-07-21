@@ -17,6 +17,7 @@
               <el-tab-pane :label="$t('message.label.two2')" name="mobile">
                 <Mobile />
               </el-tab-pane>
+
             </el-tabs>
           </div>
           <Scan v-if="isScan" />
@@ -48,6 +49,7 @@ import { NextLoading } from '/@/utils/loading';
 import Account from '/@/views/login/component/account.vue';
 import Mobile from '/@/views/login/component/mobile.vue';
 import Scan from '/@/views/login/component/scan.vue';
+
 
 // 定义接口来定义对象的类型
 interface LoginState {

@@ -6,16 +6,15 @@
         <div v-drag="['.hx-hxRoom-edit .el-dialog', '.hx-hxRoom-edit .el-dialog__header']">{{(!formData.id || formData.id==0?'添加':'修改')+'房屋信息表'}}</div>
       </template>
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px">        
-        <el-form-item label="楼栋ID" prop="buildingId">          
+        <el-form-item label="小区/楼栋" prop="buildingId">
           <el-cascader
-                  v-model="formData.buildingId"
-                  placeholder="请选择"
-                  :options="buildingIdOptions"
-                  filterable
-                  clearable
-                  :props="{ label: 'buildingName',value: 'id',checkStrictly: true,emitPath: false  }"
+            v-model="formData.buildingId"
+            placeholder="请选择小区和楼栋"
+            :props="{ label:'label', value:'id', children:'children', lazy: true, lazyLoad: cascadeLoad, checkStrictly: true, emitPath: false }"
+            filterable
+            clearable
           />
-        </el-form-item>        
+        </el-form-item>
         <el-form-item label="房号" prop="roomNo">
           <el-input v-model="formData.roomNo" placeholder="请输入房号" />
         </el-form-item>        
@@ -63,6 +62,8 @@ import {
   addHxRoom,
   updateHxRoom,  
 } from "/@/api/hx/hxRoom";
+import { listHxBuilding } from "/@/api/hx/hxBuilding";
+import { listHxCommunity } from "/@/api/hx/hxCommunity";
 import {
   HxRoomTableColumns,
   HxRoomInfoData,
@@ -183,10 +184,36 @@ const resetForm = ()=>{
     isLeaf: undefined,    
     sort: undefined,    
     status: undefined,    
-    createdAt: undefined,    
-    updatedAt: undefined,    
-  }  
+    createdAt: undefined,
+    updatedAt: undefined,
+  }
 };
+// 级联懒加载：小区→楼栋
+const cascadeLoad = (node: any, resolve: (nodes: any[]) => void) => {
+  if (node.level === 0) {
+    listHxCommunity({ pageSize: 9999 }).then((res: any) => {
+      const communities = res?.data?.list ?? []
+      resolve(communities.map((c: any) => ({
+        id: `community_${c.id}`,
+        label: c.communityName,
+        isLeaf: false,
+        _communityId: c.id,
+      })))
+    }).catch(() => resolve([]))
+  } else if (node.level === 1) {
+    const communityId = node.data._communityId
+    listHxBuilding({ pageSize: 9999, communityId }).then((res: any) => {
+      const buildings = res?.data?.list ?? []
+      resolve(buildings.map((b: any) => ({
+        id: b.id,
+        label: b.buildingName,
+        isLeaf: true,
+      })))
+    }).catch(() => resolve([]))
+  } else {
+    resolve([])
+  }
+}
 </script>
 <style scoped>  
   .kv-label{margin-bottom: 15px;font-size: 14px;}

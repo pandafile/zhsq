@@ -6,14 +6,14 @@ export interface HxPersonTableColumns {
     linkedRoomId?:LinkedHxPersonHxRoom; // 房屋ID    
     idCard:string;  // 身份证号    
     phone:string;  // 手机号    
-    personType:number;  // 居住类型    
+    persontype:number;  // 居住类型    
     birthday:string;  // 出生日期    
     nation:string;  // 民族    
-    basicInfo:string;  // 基础信息（JSON格式）    
-    specialTags:string;  // 特殊标签（JSON数组）    
-    healthInfo:string;  // 健康信息（JSON格式）    
-    familyInfo:string;  // 家庭信息（JSON格式）    
-    socialInfo:string;  // 社保信息（JSON格式）    
+    basicInfo:string;  // 基础信息    
+    specialTags:string;  // 特殊标签    
+    healthInfo:string;  // 健康信息    
+    familyInfo:string;  // 家庭信息    
+    socialInfo:string;  // 社保信息    
     remark:string;  // 备注    
     status:number;  // 状态    
     createdBy:string;  // 创建人    
@@ -30,14 +30,14 @@ export interface HxPersonInfoData {
     linkedRoomId?:LinkedHxPersonHxRoom; // 房屋ID    
     idCard:string|undefined; // 身份证号    
     phone:string|undefined; // 手机号    
-    personType:number|undefined; // 居住类型    
+    persontype:number|undefined; // 居住类型    
     birthday:string|undefined; // 出生日期    
     nation:string|undefined; // 民族    
-    basicInfo:string|undefined; // 基础信息（JSON格式）    
-    specialTags:string|undefined; // 特殊标签（JSON数组）    
-    healthInfo:string|undefined; // 健康信息（JSON格式）    
-    familyInfo:string|undefined; // 家庭信息（JSON格式）    
-    socialInfo:string|undefined; // 社保信息（JSON格式）    
+    basicInfo:string|undefined; // 基础信息    
+    specialTags:string|undefined; // 特殊标签    
+    healthInfo:string|undefined; // 健康信息    
+    familyInfo:string|undefined; // 家庭信息    
+    socialInfo:string|undefined; // 社保信息    
     remark:string|undefined; // 备注    
     status:number|undefined; // 状态    
     createdBy:string|undefined; // 创建人    
@@ -69,7 +69,7 @@ export interface HxPersonTableDataState {
             roomId: string|undefined;            
             idCard: string|undefined;            
             phone: string|undefined;            
-            personType: number|undefined;            
+            persontype: number|undefined;            
             birthday: string|undefined;            
             nation: string|undefined;            
             basicInfo: string|undefined;            
@@ -78,7 +78,6 @@ export interface HxPersonTableDataState {
             familyInfo: string|undefined;            
             socialInfo: string|undefined;            
             status: number|undefined;            
-            buildingId: number|undefined;            
             createdBy: string|undefined;            
             createdAt: string|undefined;            
             dateRange: string[];
