@@ -369,7 +369,10 @@
              />          
           <el-table-column label="诉求标题" align="center" prop="appealTitle"
             min-width="100px"            
-             />          
+             />      
+          <el-table-column label="诉求内容标注" align="center" prop="remark"
+            min-width="200px"            
+             />     
           <el-table-column label="反馈内容" align="center" prop="feedbackContent"
             min-width="300px"            
              />          
@@ -381,9 +384,7 @@
               <span style="color: #409EFF">{{ handlePersonFormat(scope.row) }}</span>
             </template>
           </el-table-column>          
-          <el-table-column label="处理图片" align="center" prop="handleImages"
-            min-width="150px"            
-             />                
+           
           <el-table-column label="诉求人姓名" align="center" prop="appealerName"
             min-width="100px"            
              />          
@@ -591,8 +592,6 @@ const linkedData = ()=>{
     })
 }
 
-const imgs=getImages()
-console.log(imgs)
 /** 重置按钮操作 */
 const resetQuery = (formEl: FormInstance | undefined) => {
     if (!formEl) return
@@ -734,22 +733,10 @@ const handleViewUpdate = async () => {
         }, token.accessToken)
         const detail = detailRes?.data?.records?.[0]
         if (detail) {
+          
           // 把 pageQuery 可能缺失的字段补上
-          item.petitionTitle = item.petitionTitle || detail.petitionTitle
-          item.petitionContent = item.petitionContent || detail.petitionContent
-          item.petitionSource = item.petitionSource || detail.petitionSource
-          item.petitionUserName = item.petitionUserName || detail.petitionUserName
-          item.petitionUserPhone = item.petitionUserPhone || detail.petitionUserPhone
-          item.petitionLocationAddress = item.petitionLocationAddress || detail.petitionLocationAddress
-          item.petitionLocationSupplement = item.petitionLocationSupplement || detail.petitionLocationSupplement
-          item.contentClassification = item.contentClassification || detail.contentClassification
-          item.registerTime = item.registerTime || detail.registerTime
-          item.isUrgent = item.isUrgent || detail.isUrgent
-          item.limitedProcessingDeadline = item.limitedProcessingDeadline || detail.limitedProcessingDeadline
-          item.petitionFeedback = item.petitionFeedback || detail.petitionFeedback
-          item.petitionYangyan = item.petitionYangyan || detail.petitionYangyan
-          item.petitionAmi = item.petitionAmi || detail.petitionAmi
-          item.petitionAml = item.petitionAml || detail.petitionAml
+          item.feedbackContent = item.feedbackContent || detail.reportContent
+
         }
       } catch (e) {
         console.warn('补充详情失败，跳过:', item.petitionNumber, e)
@@ -758,7 +745,7 @@ const handleViewUpdate = async () => {
       item._communityId = undefined
       item._handlePerson = undefined
     }
-
+    console.log("platformList",platformList)
     // 5) 逐条插入
     let ok = 0, fail = 0
     for (const item of platformList) {

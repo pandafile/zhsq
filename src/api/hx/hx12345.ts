@@ -58,10 +58,15 @@ export async function getImages(){
   params: {
     'size': '100x40'
   },
-  headers: {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
-  }
+  // headers: {
+  //   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
+  // }
 });
   return response.data
 
+}
+
+export async function loginmyi(){
+
+  
 }

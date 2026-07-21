@@ -223,6 +223,14 @@
               </template>
               {{ formData.notes }}            
           </el-descriptions-item>        
+          <el-descriptions-item :span="1">            
+              <template #label>
+                <div class="cell-item">
+                  备注2
+                </div>
+              </template>
+              {{ formData.remark }}            
+          </el-descriptions-item>        
       </el-descriptions>      
     </el-drawer>
   </div>
@@ -293,6 +301,7 @@
       createTime: undefined,      
       updateTime: undefined,      
       notes: undefined,      
+      remark: undefined,      
       linkedHx12345HxCommunity: {        
         id:undefined,    // 主键ID        
         communityName:undefined,    // 小区名称        
@@ -388,6 +397,7 @@
       createTime: undefined,      
       updateTime: undefined,      
       notes: undefined,      
+      remark: undefined,      
       linkedHx12345HxCommunity: {        
         id:undefined,    // 主键ID        
         communityName:undefined,    // 小区名称        

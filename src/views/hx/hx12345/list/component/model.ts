@@ -25,6 +25,7 @@ export interface Hx12345TableColumns {
     createTime:string;  // 记录创建时间    
     updateTime:string;  // 记录更新时间    
     notes:string;  // 备注    
+    remark:string;  // 备注2    
     linkedHx12345HxCommunity:LinkedHx12345HxCommunity;    
 }
 
@@ -56,6 +57,7 @@ export interface Hx12345InfoData {
     createTime:string|undefined; // 记录创建时间    
     updateTime:string|undefined; // 记录更新时间    
     notes:string|undefined; // 备注    
+    remark:string|undefined; // 备注2    
     linkedHx12345HxCommunity?:LinkedHx12345HxCommunity;    
 }
 
@@ -100,6 +102,7 @@ export interface Hx12345TableDataState {
             createTime: string|undefined;            
             updateTime: string|undefined;            
             notes: string|undefined;            
+            remark: string|undefined;            
             dateRange: string[];
         };
     };

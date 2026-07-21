@@ -114,7 +114,7 @@
         </el-form-item>        
         <el-form-item label="备注" prop="notes">
           <el-input v-model="formData.notes" type="textarea" placeholder="请输入备注" />
-        </el-form-item>       
+        </el-form-item>             
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -191,6 +191,7 @@ const state = reactive<Hx12345EditState>({
     createTime: undefined,    
     updateTime: undefined,    
     notes: undefined,    
+    remark: undefined,    
     linkedHx12345HxCommunity: {      
       id:undefined,    // 主键ID      
       communityName:undefined,    // 小区名称      
@@ -318,6 +319,7 @@ const resetForm = ()=>{
     createTime: undefined,    
     updateTime: undefined,    
     notes: undefined,    
+    remark: undefined,    
     linkedHx12345HxCommunity: {      
       id:undefined,    // 主键ID      
       communityName:undefined,    // 小区名称      
