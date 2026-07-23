@@ -12,9 +12,14 @@
         <el-form-item label="单元数" prop="unitCount">
           <el-input v-model="formData.unitCount" placeholder="请输入单元数" />
         </el-form-item>          
-        <el-form-item label="小区ID" prop="communityId">
-          <el-select filterable clearable v-model="formData.communityId" placeholder="请选择小区ID" >
-            <el-option label="请选择字典生成" value="" />
+        <el-form-item label="小区名称" prop="communityId">
+          <el-select filterable clearable v-model="formData.communityId" placeholder="请选择小区" >
+            <el-option
+                v-for="item in communityOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
           </el-select>
         </el-form-item>        
         <el-form-item label="楼层数" prop="floorCount">
@@ -52,7 +57,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, toRefs, ref,unref,getCurrentInstance,computed } from 'vue';
+import { reactive, toRefs, ref,unref,getCurrentInstance,computed, onMounted } from 'vue';
 import {ElMessageBox, ElMessage, FormInstance,UploadProps} from 'element-plus';
 import {
   listHxBuilding,
@@ -61,6 +66,7 @@ import {
   addHxBuilding,
   updateHxBuilding,  
 } from "/@/api/hx/hxBuilding";
+import { listHxCommunity } from "/@/api/hx/hxCommunity";
 import {
   HxBuildingTableColumns,
   HxBuildingInfoData,
@@ -78,6 +84,26 @@ const emit = defineEmits(['hxBuildingList'])
 const {proxy} = <any>getCurrentInstance()
 const formRef = ref<HTMLElement | null>(null);
 const menuRef = ref();
+// 小区下拉选项
+const communityOptions = ref<{ label: string; value: number }[]>([])
+
+// 加载小区下拉选项
+const loadCommunityOptions = async () => {
+  try {
+    const res = await listHxCommunity({ pageNum: 1, pageSize: 9999 })
+    const list = res.data.list ?? []
+    communityOptions.value = list.map((item: any) => ({
+      label: item.communityName || item.name || `小区${item.id}`,
+      value: item.id
+    }))
+  } catch (e) {
+    console.error('获取小区列表失败:', e)
+  }
+}
+
+onMounted(() => {
+  loadCommunityOptions()
+})
 const state = reactive<HxBuildingEditState>({
   loading:false,
   isShowDialog: false,
@@ -118,10 +144,14 @@ const openDialog = (row?: HxBuildingInfoData) => {
   resetForm();
   if(row) {
     getHxBuilding(row.id!).then((res:any)=>{
-      const data = res.data;      
+      const data = res.data;     
+      console.log('API返回数据:', data)
+      console.log('communityId:', data.communityId, '类型:', typeof data.communityId)
       data.communityId = parseInt(data.communityId)      
       data.status = ''+data.status      
       state.formData = data;
+
+
   })
 }
   state.isShowDialog = true;

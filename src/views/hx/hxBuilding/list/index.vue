@@ -46,9 +46,14 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="小区ID" prop="communityId">
-                    <el-select filterable v-model="tableData.param.communityId" placeholder="请选择小区ID" clearable style="width:200px;">
-                        <el-option label="请选择字典生成" value="" />
+                  <el-form-item label="小区名称" prop="communityId">
+                    <el-select filterable v-model="tableData.param.communityId" placeholder="请选择小区" clearable style="width:200px;">
+                        <el-option
+                            v-for="item in communityOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        />
                     </el-select>
                   </el-form-item>
                 </el-col>                
@@ -160,14 +165,7 @@
                   v-auth="'api/v1/hx/hxBuilding/delete'"
                 ><el-icon><ele-Delete /></el-icon>删除</el-button>
               </el-col>
-                            <el-col :span="1.5">
-                <el-button
-                  type="danger"
-                  :disabled="multiple"
-                  @click="handleDelete(null)"
-                  v-auth="'api/v1/hx/hxBuilding/delete'"
-                ><el-icon><ele-Delete /></el-icon>删除</el-button>
-              </el-col>              
+                          
             </el-row>
         </div>
         <el-table v-loading="loading" :data="tableData.data" @selection-change="handleSelectionChange">
@@ -176,12 +174,12 @@
             min-width="150px"            
              />          
           <el-table-column label="楼栋名称" align="center" prop="buildingName"
-            min-width="150px"            
+            min-width="180px"            
              />          
           <el-table-column label="单元数" align="center" prop="unitCount"
             min-width="150px"            
              />          
-          <el-table-column label="小区ID" align="center" prop="communityId"
+          <el-table-column label="小区名称" align="center" prop="communityName"
             min-width="150px"            
              />          
           <el-table-column label="楼层数" align="center" prop="floorCount"
@@ -199,9 +197,7 @@
           <el-table-column label="排序" align="center" prop="sort"
             min-width="150px"            
              />          
-          <el-table-column label="是否叶子节点：0-否（有下级） 1-是（无下级）" align="center" prop="isLeaf"
-            min-width="150px"            
-             />          
+    
           <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat"
             min-width="150px"            
              />          
@@ -273,9 +269,12 @@ import {
 } from "/@/views/hx/hxBuilding/list/component/model"
 import ApiV1HxHxBuildingEdit from "/@/views/hx/hxBuilding/list/component/edit.vue"
 import ApiV1HxHxBuildingDetail from "/@/views/hx/hxBuilding/list/component/detail.vue"
+import { getHxCommunity, listHxCommunity } from "/@/api/hx/hxCommunity"
 defineOptions({ name: "apiV1HxHxBuildingList"})
 const {proxy} = <any>getCurrentInstance()
 const loading = ref(false)
+// 小区下拉选项
+const communityOptions = ref<{ label: string; value: number }[]>([])
 const queryRef = ref()
 const editRef = ref();
 const detailRef = ref();
@@ -311,7 +310,8 @@ const state = reactive<HxBuildingTableDataState>({
             id: undefined,            
             buildingName: undefined,            
             unitCount: undefined,            
-            communityId: undefined,            
+            communityId: undefined,   
+            communityName: undefined,
             floorCount: undefined,            
             buildYear: undefined,            
             propertyCompany: undefined,            
@@ -327,11 +327,25 @@ const { tableData } = toRefs(state);
 // 页面加载时
 onMounted(() => {
     initTableData();
+    loadCommunityOptions();
 });
 // 初始化表格数据
 const initTableData = () => {    
     hxBuildingList()
 };
+// 加载小区下拉选项
+const loadCommunityOptions = async () => {
+  try {
+    const res = await listHxCommunity({ pageNum: 1, pageSize: 9999 })
+    const list = res.data.list ?? []
+    communityOptions.value = list.map((item: any) => ({
+      label: item.communityName || item.name || `小区${item.id}`,
+      value: item.id
+    }))
+  } catch (e) {
+    console.error('获取小区列表失败:', e)
+  }
+}
 /** 重置按钮操作 */
 const resetQuery = (formEl: FormInstance | undefined) => {
     if (!formEl) return
@@ -339,15 +353,45 @@ const resetQuery = (formEl: FormInstance | undefined) => {
     hxBuildingList()
 };
 // 获取列表数据
-const hxBuildingList = ()=>{
+// 获取列表数据
+const hxBuildingList = () => {
   loading.value = true
-  listHxBuilding(state.tableData.param).then((res:any)=>{
-    let list = res.data.list??[];    
+  listHxBuilding(state.tableData.param).then(async (res: any) => {
+    const list = res.data.list ?? [];
+
+    // 收集所有唯一的 communityId
+    const uniqueIds: number[] = [...new Set(list.map((item: any) => item.communityId).filter((id: number) => id))] as number[];
+
+    if (uniqueIds.length > 0) {
+      try {
+        // 并行请求所有小区信息
+        const communityResults = await Promise.all(
+          uniqueIds.map((id: number) => getHxCommunity(id))
+        );
+        // 构建 id -> communityName 映射
+        const communityMap: Record<number, string> = {};
+        communityResults.forEach((res: any) => {
+          const data = res.data;
+          console.log(data)
+          if (data && data.id) {
+            communityMap[data.id] = data.communityName || data.name || `小区${data.id}`;
+          }
+        });
+        // 给列表每行赋值小区名称
+        list.forEach((item: any) => {
+          item.communityName = communityMap[item.communityId] || `小区${item.communityId}`;
+        });
+      } catch (e) {
+        console.error('获取小区名称失败:', e);
+      }
+    }
+
     state.tableData.data = list;
     state.tableData.total = res.data.total;
     loading.value = false
   })
 };
+
 const toggleSearch = () => {
     showAll.value = !showAll.value;
 }

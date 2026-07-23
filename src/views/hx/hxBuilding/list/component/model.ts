@@ -43,7 +43,8 @@ export interface HxBuildingTableDataState {
             id: number|undefined;            
             buildingName: string|undefined;            
             unitCount: number|undefined;            
-            communityId: number|undefined;            
+            communityId: number|undefined;     
+            communityName:string|undefined;       
             floorCount: number|undefined;            
             buildYear: |undefined;            
             propertyCompany: string|undefined;            
