@@ -1,195 +1,292 @@
 <template>
-  <div class="login-container">
-    <div class="login-content-out">
-      <div class="login-content">
-        <div class="login-content-main">
-          <div class="login-icon-group">
-            <div class="login-icon-group-title">
-              <img :src="logoMini" />
-              <div class="login-icon-group-title-text font25">{{ getThemeConfig.globalViceTitle }}</div>
+  <div class="login-page">
+    <!-- 背景样式 -->
+    <div class="login-bg">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+
+    <div class="login-container">
+      <!-- 左边 -->
+      <div class="login-left">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+          <div>
+            <h1>华新智慧社区</h1>
+            <p>Smart Community Platform</p>
+          </div>
+        </div>
+
+        <div class="features">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <el-icon><Calendar /></el-icon>
+            </div>
+            <div class="feature-text">
+              <h4>丰富活动</h4>
+              <p>参与社区精彩活动</p>
             </div>
           </div>
-          <div v-if="!isScan">
-            <el-tabs v-model="tabsActiveName">
-              <el-tab-pane :label="$t('message.label.one1')" name="account">
-                <Account />
-              </el-tab-pane>
-              <el-tab-pane :label="$t('message.label.two2')" name="mobile">
-                <Mobile />
-              </el-tab-pane>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <el-icon><Tools /></el-icon>
+            </div>
+            <div class="feature-text">
+              <h4>便民服务</h4>
+              <p>租房、便捷生活触手可及</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <el-icon><Star /></el-icon>
+            </div>
+            <div class="feature-text">
+              <h4>积分奖励</h4>
+              <p>参与获取积分好礼</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            </el-tabs>
-          </div>
-          <Scan v-if="isScan" />
-          <div class="login-content-main-sacn" @click="isScan = !isScan">
-            <i class="iconfont" :class="isScan ? 'icon-diannao1' : 'icon-barcode-qr'"></i>
-            <div class="login-content-main-sacn-delta"></div>
-          </div>
+      <!-- 右边 -->
+      <div class="login-right">
+        <div class="login-card">
+          <h2 class="login-title">欢迎回来</h2>
+          <p class="login-subtitle">登录您的账号</p>
+          <Account />
         </div>
       </div>
     </div>
+
     <div class="login-footer">
-      <div class="login-footer-content mt15">
-        <div class="login-footer-content-warp">
-          <div>Copyright © 2021-2023 g-fast.cn All Rights Reserved.</div>
-          <div class="mt5">云南奇讯科技有限公司版权所有</div>
-        </div>
-      </div>
+      <div>Copyright © 2021-2024 华新智慧社区 版权所有</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { toRefs, reactive, computed, defineComponent, onMounted } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useThemeConfig } from '/@/stores/themeConfig';
-import logoMini from '/@/assets/logo-mini.svg';
-import loginIconTwo from '/@/assets/login-icon-two.svg';
+import { onMounted } from 'vue';
+import { Calendar, Tools, Star } from '@element-plus/icons-vue';
 import { NextLoading } from '/@/utils/loading';
 import Account from '/@/views/login/component/account.vue';
-import Mobile from '/@/views/login/component/mobile.vue';
-import Scan from '/@/views/login/component/scan.vue';
 
+defineOptions({ name: 'loginIndex' });
 
-// 定义接口来定义对象的类型
-interface LoginState {
-	tabsActiveName: string;
-	isScan: boolean;
-}
-defineOptions({ name: "loginIndex"})
-const storesThemeConfig = useThemeConfig();
-const { themeConfig } = storeToRefs(storesThemeConfig);
-const state = reactive<LoginState>({
-  tabsActiveName: 'account',
-  isScan: false,
-});
-const { tabsActiveName,isScan } = toRefs(state);
-// 获取布局配置信息
-const getThemeConfig = computed(() => {
-  return themeConfig.value;
-});
-// 页面加载时
+// 页面加载时关闭 loading 动画
 onMounted(() => {
   NextLoading.done();
 });
 </script>
 
-
 <style scoped lang="scss">
-.login-container {
-  width: 100%;
-  height: 100%;
+.login-page {
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
   position: relative;
-  background-image: url("/@/assets/bg.jpg");
-  background-size: cover;
-  .login-icon-group {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    .login-icon-group-title {
-      display: flex;
-      align-items: center;
-      img {
-        width: 80px;
-        height: 70px;
-      }
-      &-text {
-        padding-left: 5px;
-        color: var(--el-color-primary);
-      }
-    }
-    &-icon {
-      width: 60%;
-      height: 70%;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-    }
+  overflow: hidden;
+}
+
+.login-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.shape-1 {
+  width: 400px;
+  height: 400px;
+  top: -100px;
+  left: -100px;
+  animation: float 10s ease-in-out infinite;
+}
+
+.shape-2 {
+  width: 300px;
+  height: 300px;
+  bottom: -50px;
+  right: 20%;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+.shape-3 {
+  width: 200px;
+  height: 200px;
+  top: 40%;
+  right: -50px;
+  animation: float 12s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(30px, -30px) rotate(5deg); }
+}
+
+.login-container {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.login-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  color: white;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 60px;
+}
+
+.brand-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.brand h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.brand p {
+  font-size: 13px;
+  // 副标题使用背景色（橙色），与背景融合，不再为蓝色/白色
+  color: #f97316;
+  margin: 4px 0 0;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(8px);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.feature-text h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.feature-text p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 48px 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.login-subtitle {
+  font-size: 15px;
+  color: var(--el-text-color-secondary);
+  margin: 0 0 32px;
+  text-align: center;
+}
+
+.login-footer {
+  position: absolute;
+  bottom: 16px;
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .login-left {
+    display: none;
   }
-  .login-content-out {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+
+  .login-right {
+    padding: 24px;
   }
-  .login-content {
-    width: 500px;
-    padding: 20px;
-    margin: auto;
-    background-color: var(--el-color-white);
-    border: 5px solid var(--el-color-primary-light-8);
-    border-radius: 5px;
-    overflow: hidden;
-    z-index: 1;
-    position: relative;
-    .login-content-main {
-      margin: 0 auto;
-      width: 80%;
-      .login-content-title {
-        color: var(--el-text-color-primary);
-        font-weight: 500;
-        font-size: 22px;
-        text-align: center;
-        letter-spacing: 4px;
-        margin: 15px 0 30px;
-        white-space: nowrap;
-        z-index: 5;
-        position: relative;
-        transition: all 0.3s ease;
-      }
-    }
-    .login-content-main-sacn {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 50px;
-      height: 50px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all ease 0.3s;
-      color: var(--el-text-color-primary);
-      &-delta {
-        position: absolute;
-        width: 35px;
-        height: 70px;
-        z-index: 2;
-        top: 2px;
-        right: 21px;
-        background: var(--el-color-white);
-        transform: rotate(-45deg);
-      }
-      &:hover {
-        opacity: 1;
-        transition: all ease 0.3s;
-        color: var(--el-color-primary) !important;
-      }
-      i {
-        width: 47px;
-        height: 50px;
-        display: inline-block;
-        font-size: 48px;
-        position: absolute;
-        right: 2px;
-        top: -1px;
-      }
-    }
-  }
-  .login-footer{
-    position: absolute;
-    bottom: 5px;
-    width: 100%;
-    &-content {
-      width: 100%;
-      display: flex;
-      &-warp {
-        margin: auto;
-        color: #e0e3e9;
-        text-align: center;
-        animation: error-num 1s ease-in-out;
-      }
-    }
+
+  .login-card {
+    padding: 32px 24px;
   }
 }
 </style>

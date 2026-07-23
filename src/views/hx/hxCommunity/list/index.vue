@@ -1,6 +1,10 @@
 <template>
   <div class="hx-hxCommunity-container">
     <el-card shadow="hover">
+        <div class="hx-card-header">
+          <span class="hx-card-header__bar"></span>
+          <span class="hx-card-header__title">小区管理</span>
+        </div>
         <div class="hx-hxCommunity-search mb15">            
             <el-form :model="tableData.param" ref="queryRef" :inline="true" label-width="100px">
             <el-row>                

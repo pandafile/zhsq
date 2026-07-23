@@ -1,7 +1,11 @@
 <template>
   <div class="hx-hxRoom-container">
     <el-card shadow="hover">
-        <div class="hx-hxRoom-search mb15">            
+        <div class="hx-card-header">
+          <span class="hx-card-header__bar"></span>
+          <span class="hx-card-header__title">房屋管理</span>
+        </div>
+        <div class="hx-page-search mb15">            
             <el-form :model="tableData.param" ref="queryRef" :inline="true" label-width="100px">
             <el-row>                
                 <el-col :span="8" class="colBlock">
@@ -150,15 +154,17 @@
              />          
 <el-table-column label="房屋标签" align="left" prop="roomTags" min-width="200px">
     <template #default="scope">
-        <div v-if="scope.row.roomTags">
+        <div v-if="scope.row.roomTags" class="hx-tags">
             <el-tag
                     v-for="(value, key) in parseJson(scope.row.roomTags)"
                     :key="key"
                     size="small"
+                    :type="getTagType(key)"
+                    effect="light"
                     style="margin: 2px"
                     >
                 {{ value }}
-            </el-tag> 
+            </el-tag>
         </div>
         <span v-else>-</span>
     </template>
@@ -166,9 +172,15 @@
           <el-table-column label="备注" align="center" prop="remark"
             min-width="150px"            
              />                
-          <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat"
-            min-width="150px"            
-             />          
+          <el-table-column label="状态" align="center" prop="status"
+            min-width="120px"
+            >
+            <template #default="scope">
+              <span :class="['status-tag', getStatusClass(scope.row.status)]">
+                {{ statusFormat(scope.row) }}
+              </span>
+            </template>
+          </el-table-column>          
           <el-table-column label="创建时间" align="center" prop="createdAt"
             min-width="150px"            
             >
@@ -359,6 +371,31 @@ const toggleSearch = () => {
 // 状态字典翻译
 const statusFormat = (row:HxRoomTableColumns) => {
     return proxy.selectDictLabel(hx_status.value, row.status);
+}
+// 根据状态值返回 status-tag 颜色类
+const getStatusClass = (status: any) => {
+    // 启用/正常 → success；其他(禁用/停用) → danger
+    if (status === 1 || status === '1' || status === '正常' || status === '启用') {
+        return 'status-tag--success';
+    }
+    if (status === 0 || status === '0' || status === '禁用' || status === '停用') {
+        return 'status-tag--danger';
+    }
+    return 'status-tag--info';
+}
+// 为房屋标签分配不同的 el-tag 类型，保证颜色多样化
+const tagTypePool = ['primary', 'success', 'warning', 'danger', 'info'] as const;
+const getTagType = (key: any) => {
+    const index = Math.abs(hashCode(String(key))) % tagTypePool.length;
+    return tagTypePool[index];
+}
+const hashCode = (str: string) => {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+        h = (h << 5) - h + str.charCodeAt(i);
+        h |= 0;
+    }
+    return h;
 }
 // 多选框选中数据
 const handleSelectionChange = (selection:Array<HxRoomInfoData>) => {

@@ -1,0 +1,455 @@
+/* ============================================================
+   业务页面统一视觉规范
+   参考「智慧大屏」首页卡片风格，统一全站基础组件外观与卡片标题。
+   仅做外观统一，不改变布局结构，且兼容深色模式（均使用 CSS 变量）。
+   ============================================================ */
+
+/* 1. 统一的业务页卡片标题栏（供各列表页 el-card 内使用） */
+.hx-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  &__bar {
+    width: 4px;
+    height: 16px;
+    margin-right: 10px;
+    border-radius: 2px;
+    background: var(--el-color-primary);
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+    letter-spacing: 0.5px;
+  }
+
+  &__extra {
+    margin-left: auto;
+  }
+}
+
+/* 2. 统一所有 el-card 外观（圆角、边框，全站生效） */
+.el-card {
+  border-radius: 6px;
+  border: 1px solid var(--next-border-color-light);
+
+  .el-card__header {
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+    border-bottom: 1px solid var(--next-border-color-light);
+  }
+}
+
+/* 3. 统一表格表头背景与字重（全站生效） */
+.el-table {
+  th.el-table__cell {
+    background-color: var(--el-color-primary-light-9);
+    color: var(--el-text-color-primary);
+    font-weight: 600;
+  }
+}
+
+/* 4. 统一按钮圆角（全站生效） */
+.el-button {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+  &:not(.is-link):not(.is-text):not(.is-circle):not(.is-round) {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  // 主操作按钮：橙色渐变（与登录页/侧边栏统一）
+  &.el-button--primary {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    border-color: #f97316;
+
+    &:hover,
+    &:focus {
+      background: linear-gradient(135deg, #ea580c 0%, #ea580c 100%);
+      border-color: #ea580c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(249, 115, 22, 0.35);
+    }
+  }
+
+  &.el-button--success {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    border-color: #10b981;
+
+    &:hover,
+    &:focus {
+      background: linear-gradient(135deg, #059669 0%, #059669 100%);
+      border-color: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+    }
+  }
+
+  &.el-button--warning {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-color: #f59e0b;
+
+    &:hover,
+    &:focus {
+      background: linear-gradient(135deg, #d97706 0%, #d97706 100%);
+      border-color: #d97706;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.35);
+    }
+  }
+
+  &.el-button--danger {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    border-color: #ef4444;
+
+    &:hover,
+    &:focus {
+      background: linear-gradient(135deg, #dc2626 0%, #dc2626 100%);
+      border-color: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.35);
+    }
+  }
+
+  &.el-button--info {
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    border-color: #60a5fa;
+
+    &:hover,
+    &:focus {
+      background: linear-gradient(135deg, #2563eb 0%, #2563eb 100%);
+      border-color: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(96, 165, 250, 0.35);
+    }
+  }
+}
+
+/* 5. 侧边栏背景：参照登录页橙色渐变（不影响深色模式） */
+:root:not([data-theme='dark']) {
+  .layout-container {
+    .layout-aside {
+      // 与登录页一致的橙色渐变
+      background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+      box-shadow: 2px 0 8px rgba(249, 115, 22, 0.25);
+
+      // 顶部 Logo 文字在橙底上使用白色
+      .layout-logo {
+        color: #ffffff;
+      }
+
+      // 菜单文字在橙底上使用浅色，保证可读性
+      .el-menu-item,
+      .el-sub-menu__title {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      // 当前激活菜单项：半透明白底 + 纯白文字
+      .el-menu-item.is-active,
+      .el-sub-menu.is-active > .el-sub-menu__title {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.18) !important;
+      }
+
+      // 鼠标悬浮：浅色高亮
+      .el-menu-item:hover,
+      .el-sub-menu:not(.is-opened):hover > .el-sub-menu__title {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.12) !important;
+      }
+    }
+  }
+}
+
+/* 6. 业务卡片：增强阴影、标题与背景渐变 */
+.el-card {
+  border-radius: 8px;
+  border: 1px solid var(--next-border-color-light);
+  background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  .el-card__header {
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+    border-bottom: 1px solid var(--next-border-color-light);
+    padding: 16px 20px;
+  }
+
+  .el-card__body {
+    padding: 20px;
+  }
+}
+
+/* 7. 业务页卡片标题增强：渐变文字 + 加重 bar */
+.hx-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(251, 146, 60, 0.25);
+
+  &__bar {
+    width: 4px;
+    height: 18px;
+    margin-right: 10px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
+    box-shadow: 0 0 8px rgba(251, 146, 60, 0.45);
+  }
+
+  &__title {
+    font-size: 17px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+  }
+
+  &__extra {
+    margin-left: auto;
+  }
+}
+
+/* 8. 搜索/操作区容器：淡橙色背景 + 圆角 */
+.hx-page-search,
+.system-user-search {
+  padding: 18px 20px 4px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1px solid rgba(251, 146, 60, 0.15);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  .el-form-item__label {
+    color: #9a3412;
+    font-weight: 500;
+  }
+
+  // 内部按钮区与搜索区分隔
+  > .el-row:last-child {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(251, 146, 60, 0.25);
+  }
+}
+
+/* 9. 表格美化：渐变表头、悬浮高亮、斑马纹 */
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
+
+  &::before,
+  &::after {
+    display: none !important;
+  }
+
+  th.el-table__cell {
+    background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%) !important;
+    color: #9a3412;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(251, 146, 60, 0.2);
+    height: 50px;
+  }
+
+  td.el-table__cell {
+    border-bottom: 1px solid #fef3c7;
+    padding: 14px 0;
+  }
+
+  tr.el-table__row--striped td.el-table__cell {
+    background-color: #fffaf5 !important;
+  }
+
+  tbody tr:hover > td.el-table__cell {
+    background-color: #fff7ed !important;
+  }
+
+  // 空数据时样式优化
+  .el-table__empty-block {
+    background: #fffaf5;
+  }
+}
+
+/* 10. 标签样式增强：渐变色块 */
+.el-tag {
+  border-radius: 4px;
+  font-weight: 500;
+  border: none;
+
+  &.el-tag--primary {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    color: #ffffff;
+  }
+
+  &.el-tag--success {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    color: #ffffff;
+  }
+
+  &.el-tag--warning {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #ffffff;
+  }
+
+  &.el-tag--danger {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    color: #ffffff;
+  }
+
+  &.el-tag--info {
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    color: #ffffff;
+  }
+
+  // 浅色（淡橙/淡绿等）通用风格
+  &.el-tag--light {
+    background: rgba(251, 146, 60, 0.1);
+    color: #c2410c;
+    border: 1px solid rgba(251, 146, 60, 0.2);
+  }
+}
+
+/* 11. 状态指示胶囊（带前置圆点） */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  &.status-tag--success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+
+    &::before {
+      background: #10b981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+    }
+  }
+
+  &.status-tag--danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
+
+    &::before {
+      background: #ef4444;
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+    }
+  }
+
+  &.status-tag--warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #b45309;
+
+    &::before {
+      background: #f59e0b;
+      box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+    }
+  }
+
+  &.status-tag--info {
+    background: rgba(96, 165, 250, 0.12);
+    color: #1d4ed8;
+
+    &::before {
+      background: #60a5fa;
+      box-shadow: 0 0 6px rgba(96, 165, 250, 0.6);
+    }
+  }
+
+  &.status-tag--primary {
+    background: rgba(251, 146, 60, 0.14);
+    color: #c2410c;
+
+    &::before {
+      background: #f97316;
+      box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);
+    }
+  }
+}
+
+/* 12. 房屋/小区等业务标签集合：自动分配柔和色系 */
+.hx-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  .el-tag {
+    background: rgba(251, 146, 60, 0.08);
+    color: #9a3412;
+    border: 1px solid rgba(251, 146, 60, 0.2);
+  }
+}
+
+/* 13. 分页组件视觉增强 */
+.pagination-container,
+.el-pagination {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+
+  .el-pager li,
+  .btn-prev,
+  .btn-next {
+    border-radius: 4px !important;
+    transition: all 0.2s ease;
+  }
+
+  .el-pager li.is-active {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%) !important;
+    color: #ffffff !important;
+  }
+}
+
+/* 14. 表单项输入控件聚焦：橙色主题 */
+.el-input__wrapper.is-focus,
+.el-textarea__inner:focus,
+.el-select__wrapper.is-focused {
+  box-shadow: 0 0 0 1px #f97316 inset !important;
+}
+
+/* 15. 文字型按钮（type="primary" link / text）：改为品牌橙、无底色，
+       统一页面中"详情/修改/展开搜索/导入/预览"等蓝色文字按钮的视觉 */
+.el-button--primary.is-link,
+.el-button--primary.is-link.is-plain,
+.el-button--primary.is-text,
+.el-button--primary.is-text.is-plain {
+  color: #f97316 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+
+  &:hover,
+  &:focus {
+    color: #ea580c !important;
+    background: rgba(249, 115, 22, 0.08) !important;
+    border-color: transparent !important;
+  }
+
+  &:active {
+    color: #c2410c !important;
+  }
+}

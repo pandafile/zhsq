@@ -694,14 +694,17 @@ defineOptions({ name: "layoutTagsView"})
       }
       &:hover {
         @extend .tags-style-five-svg;
-        background: var(--el-color-primary-light-9);
+        // 悬浮态使用淡橙底，与激活态呼应
+        background: rgba(249, 115, 22, 0.08);
         color: unset;
       }
     }
     .is-active {
       @extend .tags-style-five-svg;
-      background: var(--el-color-primary-light-9) !important;
-      color: var(--el-color-primary) !important;
+      // 蓝色字体改为品牌橙 #f97316，且不显示底色
+      background: transparent !important;
+      color: #f97316 !important;
+      font-weight: 600;
       z-index: 1;
     }
   }

@@ -1,6 +1,10 @@
 <template>
   <div class="hx-hx12345-container">
     <el-card shadow="hover">
+        <div class="hx-card-header">
+          <span class="hx-card-header__bar"></span>
+          <span class="hx-card-header__title">12345 诉求管理</span>
+        </div>
         <div class="hx-hx12345-search mb15">            
             <el-form :model="tableData.param" ref="queryRef" :inline="true" label-width="100px">
             <el-row>                
