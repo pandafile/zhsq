@@ -272,7 +272,8 @@ const setRoleUser = (ids:any)=>{
   margin:6px 8px 0 8px;
   .el-dropdown-link {
     cursor: pointer;
-    color: var(--el-color-primary);
+    // 与全站文字按钮一致：品牌橙、无底色
+    color: #f97316;
     font-size: 12px;
     display: flex;
     align-items: center;
